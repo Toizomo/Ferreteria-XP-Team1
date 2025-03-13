@@ -11,7 +11,7 @@ public class ConexionBD
 
         try
         {
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ferreteria","root","");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/restaurante","root","");
         }
         catch (Exception e)
         {
