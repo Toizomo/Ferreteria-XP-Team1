@@ -1,4 +1,4 @@
-package ClientesGUI;
+package Clientes.ClientesGUI;
 
 import Clientes.Clientes;
 import Clientes.ClientesDAO;
