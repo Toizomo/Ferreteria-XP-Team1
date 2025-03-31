@@ -1,130 +1,130 @@
 package Empleados;
 
+import Conexion.ConexionBD;
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmpleadosDAO {
-    private Connection conexion;
+    private final ConexionBD conexionBD;
 
-    // Método para establecer conexión (debes configurar los detalles de conexión)
-    private void conectar() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/ferreteria";
-        String usuario = "tu_usuario";
-        String contrasena = "tu_contraseña";
-        conexion = DriverManager.getConnection(url, usuario, contrasena);
+    public EmpleadosDAO() {
+        conexionBD = new ConexionBD();
     }
 
-    // Método para cerrar conexión
-    private void desconectar() throws SQLException {
-        if (conexion != null && !conexion.isClosed()) {
-            conexion.close();
-        }
-    }
-
-    // Crear nuevo empleado
+    // Método mejorado para insertar empleado
     public boolean insertarEmpleado(Empleados empleado) {
-        try {
-            conectar();
-            String sql = "INSERT INTO empleados (nombre, cargo, salario) VALUES (?, ?, ?)";
-            PreparedStatement statement = conexion.prepareStatement(sql);
-            statement.setString(1, empleado.getNombre());
-            statement.setString(2, empleado.getCargo());
-            statement.setDouble(3, empleado.getSalario());
+        String sql = "INSERT INTO empleados (nombre, cargo, salario) VALUES (?, ?, ?)";
+        try (Connection con = conexionBD.getconnection();
+             PreparedStatement pst = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            int filasInsertadas = statement.executeUpdate();
-            desconectar();
-            return filasInsertadas > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+            pst.setString(1, empleado.getNombre());
+            pst.setString(2, empleado.getCargo());
+            pst.setDouble(3, empleado.getSalario());
 
-    // Listar todos los empleados
-    public List<Empleados> listarEmpleados() {
-        List<Empleados> listaEmpleados = new ArrayList<>();
-        try {
-            conectar();
-            String sql = "SELECT * FROM empleados";
-            Statement statement = conexion.createStatement();
-            ResultSet resultado = statement.executeQuery(sql);
+            int filasAfectadas = pst.executeUpdate();
 
-            while (resultado.next()) {
-                Empleados empleado = new Empleados(
-                        resultado.getInt("id_empleado"),
-                        resultado.getString("nombre"),
-                        resultado.getString("cargo"),
-                        resultado.getDouble("salario")
-                );
-                listaEmpleados.add(empleado);
+            if (filasAfectadas > 0) {
+                try (ResultSet generatedKeys = pst.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        empleado.setId_empleado(generatedKeys.getInt(1));
+                    }
+                }
+                return true;
             }
-            desconectar();
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al insertar empleado: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
-        return listaEmpleados;
+        return false;
     }
 
-    // Actualizar empleado
+    // Método mejorado para actualizar empleado
     public boolean actualizarEmpleado(Empleados empleado) {
-        try {
-            conectar();
-            String sql = "UPDATE empleados SET nombre = ?, cargo = ?, salario = ? WHERE id_empleado = ?";
-            PreparedStatement statement = conexion.prepareStatement(sql);
-            statement.setString(1, empleado.getNombre());
-            statement.setString(2, empleado.getCargo());
-            statement.setDouble(3, empleado.getSalario());
-            statement.setInt(4, empleado.getId_empleado());
+        String sql = "UPDATE empleados SET nombre = ?, cargo = ?, salario = ? WHERE id_empleado = ?";
+        try (Connection con = conexionBD.getconnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
 
-            int filasActualizadas = statement.executeUpdate();
-            desconectar();
-            return filasActualizadas > 0;
+            pst.setString(1, empleado.getNombre());
+            pst.setString(2, empleado.getCargo());
+            pst.setDouble(3, empleado.getSalario());
+            pst.setInt(4, empleado.getId_empleado());
+
+            return pst.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            JOptionPane.showMessageDialog(null, "Error al actualizar empleado: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return false;
     }
 
-    // Eliminar empleado
-    public boolean eliminarEmpleado(int id_empleado) {
-        try {
-            conectar();
-            String sql = "DELETE FROM empleados WHERE id_empleado = ?";
-            PreparedStatement statement = conexion.prepareStatement(sql);
-            statement.setInt(1, id_empleado);
+    // Método mejorado para eliminar empleado
+    public boolean eliminarEmpleado(int idEmpleado) {
+        String sql = "DELETE FROM empleados WHERE id_empleado = ?";
+        try (Connection con = conexionBD.getconnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
 
-            int filasEliminadas = statement.executeUpdate();
-            desconectar();
-            return filasEliminadas > 0;
+            pst.setInt(1, idEmpleado);
+            return pst.executeUpdate() > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            JOptionPane.showMessageDialog(null,
+                    "No se puede eliminar el empleado porque tiene órdenes asociadas",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            JOptionPane.showMessageDialog(null, "Error al eliminar empleado: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return false;
     }
 
-    // Buscar empleado por ID
-    public Empleados obtenerEmpleadoPorId(int id_empleado) {
-        Empleados empleado = null;
-        try {
-            conectar();
-            String sql = "SELECT * FROM empleados WHERE id_empleado = ?";
-            PreparedStatement statement = conexion.prepareStatement(sql);
-            statement.setInt(1, id_empleado);
-            ResultSet resultado = statement.executeQuery();
+    // Método para obtener todos los empleados
+    public List<Empleados> obtenerTodosEmpleados() {
+        List<Empleados> empleados = new ArrayList<>();
+        String sql = "SELECT * FROM empleados";
 
-            if (resultado.next()) {
-                empleado = new Empleados(
-                        resultado.getInt("id_empleado"),
-                        resultado.getString("nombre"),
-                        resultado.getString("cargo"),
-                        resultado.getDouble("salario")
+        try (Connection con = conexionBD.getconnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Empleados emp = new Empleados(
+                        rs.getInt("id_empleado"),
+                        rs.getString("nombre"),
+                        rs.getString("cargo"),
+                        rs.getDouble("salario")
                 );
+                empleados.add(emp);
             }
-            desconectar();
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al obtener empleados: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
-        return empleado;
+        return empleados;
+    }
+
+    // Método para buscar empleado por ID
+    public Empleados obtenerEmpleadoPorId(int idEmpleado) {
+        String sql = "SELECT * FROM empleados WHERE id_empleado = ?";
+
+        try (Connection con = conexionBD.getconnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setInt(1, idEmpleado);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return new Empleados(
+                            rs.getInt("id_empleado"),
+                            rs.getString("nombre"),
+                            rs.getString("cargo"),
+                            rs.getDouble("salario")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al buscar empleado: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
     }
 }
