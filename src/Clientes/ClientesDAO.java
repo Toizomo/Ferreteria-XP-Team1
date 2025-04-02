@@ -19,8 +19,8 @@ public class ClientesDAO {
         try {
             PreparedStatement pst = con.prepareStatement(query);
             pst.setString(1, cliente.getNombre());
-            pst.setString(2, cliente.gettelefono());
-            pst.setString(3, cliente.getdireccion());
+            pst.setString(2, cliente.getTelefono());
+            pst.setString(3, cliente.getDireccion());
             pst.setString(4, cliente.getCorreo());
 
             int resultado = pst.executeUpdate();
@@ -62,9 +62,10 @@ public class ClientesDAO {
         try {
             PreparedStatement pst = con.prepareStatement(query);
             pst.setString(1, cliente.getNombre());
-            pst.setString(2, cliente.gettelefono());
-            pst.setString(3, cliente.getdireccion());
+            pst.setString(2, cliente.getTelefono());
+            pst.setString(3, cliente.getDireccion());
             pst.setString(4, cliente.getCorreo());
+            pst.setInt(5, cliente.getId_clientes());
 
             int resultado = pst.executeUpdate();
 
@@ -76,20 +77,5 @@ public class ClientesDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public ResultSet consultar() {
-        Connection con = ConexionBD.getconnection();
-        String query = "SELECT * FROM clientes";
-        ResultSet rs = null;
-
-        try {
-            PreparedStatement pst = con.prepareStatement(query);
-            rs = pst.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return rs;
     }
 }
