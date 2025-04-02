@@ -1,10 +1,18 @@
 package Proveedores;
 
 public class Proveedores {
+
     private int id_proveedor;
     private String nombre;
     private String contacto;
-    private String categoria_producto;
+    private String productos_suministrados;
+
+    public Proveedores(int id_proveedor, String nombre, String contacto, String productos_suministrados) {
+        this.id_proveedor = id_proveedor;
+        this.nombre = nombre;
+        this.contacto = contacto;
+        this.productos_suministrados = productos_suministrados;
+    }
 
     public int getId_proveedor() {
         return id_proveedor;
@@ -30,11 +38,11 @@ public class Proveedores {
         this.contacto = contacto;
     }
 
-    public String getCategoria_producto() {
-        return categoria_producto;
+    public String getProductos_suministrados() {
+        return productos_suministrados;
     }
 
-    public void setCategoria_producto(String categoria_producto) {
-        this.categoria_producto = categoria_producto;
+    public void setProductos_suministrados(String productos_suministrados) {
+        this.productos_suministrados = productos_suministrados;
     }
 }
