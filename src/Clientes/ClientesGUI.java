@@ -1,4 +1,4 @@
-package Proveedores;
+package Clientes;
 
 import Conexion.ConexionBD;
 
@@ -13,64 +13,65 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class ProveedoresGUI {
-
+public class ClientesGUI {
     private JPanel main;
     private JTable table1;
     private JTextField textField1;
     private JTextField textField2;
     private JTextField textField3;
+    private JTextField textField4;
     private JButton agregarButton;
     private JButton actualizarButton;
     private JButton eliminarButton;
-    ProveedoresDAO ProveedoresDAO = new ProveedoresDAO();
+    private JTextField textField5;
+    ClientesDAO ClientesDAO = new ClientesDAO();
     ConexionBD ConexionBD = new ConexionBD();
     int filas = 0;
 
+    public ClientesGUI() {
 
-    public ProveedoresGUI()
-    {
-        agregarButton.addActionListener(new ActionListener()
-        {
+        agregarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 String nombre = textField2.getText();
-                String contacto = textField3.getText();
-
-                Proveedores Proveedores = new Proveedores(0, nombre, contacto);
-                ProveedoresDAO.agregar(Proveedores);
+                String telefono = textField3.getText();
+                String direccion = textField4.getText();
+                String correo = textField5.getText();
+                Clientes Clientes = new Clientes(0, nombre, telefono, direccion, correo);
+                ClientesDAO.agregar(Clientes);
                 mostrar();
+
             }
         });
 
-        actualizarButton.addActionListener(new ActionListener()
-        {
+        actualizarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 String nombre = textField2.getText();
-                String contacto = textField3.getText();
-                int id_proveedor = Integer.parseInt(textField1.getText());
-                Proveedores Proveedores = new Proveedores(0, nombre, contacto);
-                ProveedoresDAO.actualizar(Proveedores);
+                String telefono = textField3.getText();
+                String direccion = textField4.getText();
+                String correo = textField5.getText();
+                Clientes Clientes = new Clientes(0, nombre, telefono, direccion, correo);
+                ClientesDAO.actualizar(Clientes);
                 mostrar();
+
             }
         });
 
-        eliminarButton.addActionListener(new ActionListener()
-        {
+
+        eliminarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                int id_proveedor = Integer.parseInt(textField1.getText());
-                ProveedoresDAO.eliminar(id_proveedor);
+                int id_clientes = Integer.parseInt(textField1.getText());
+                ClientesDAO.eliminar(id_clientes);
                 mostrar();
             }
         });
 
-        table1.addMouseListener(new MouseAdapter()
-        {
+        table1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e)
             {
@@ -82,6 +83,7 @@ public class ProveedoresGUI {
                     textField1.setText((String) table1.getValueAt(selectFila, 0));
                     textField2.setText((String) table1.getValueAt(selectFila, 1));
                     textField3.setText((String) table1.getValueAt(selectFila, 2));
+                    textField4.setText((String) table1.getValueAt(selectFila, 3));
 
                     filas = selectFila;
                 }
@@ -92,18 +94,19 @@ public class ProveedoresGUI {
     public void mostrar()
     {
         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID Proveedor");
+        model.addColumn("ID cliente");
         model.addColumn("Nombre");
-        model.addColumn("Contacto");
+        model.addColumn("Telefono");
+        model.addColumn("Direccion");
+        model.addColumn("Correo");
 
         table1.setModel(model);
-        String [] dato = new String[3];
+        String[] dato = new String[5];
         Connection con = ConexionBD.getconnection();
 
-        try
-        {
+        try {
             Statement stat = con.createStatement();
-            String query = "SELECT * FROM proveedores";
+            String query = "SELECT * FROM clientes";
             ResultSet fb = stat.executeQuery(query);
 
             while (fb.next())
@@ -111,6 +114,8 @@ public class ProveedoresGUI {
                 dato[0] = fb.getString(1);
                 dato[1] = fb.getString(2);
                 dato[2] = fb.getString(3);
+                dato[3] = fb.getString(4);
+                dato[4] = fb.getString(5);
                 model.addRow(dato);
             }
         }
@@ -118,12 +123,13 @@ public class ProveedoresGUI {
         {
             e.printStackTrace();
         }
+
     }
 
     public static void main(String[] args)
     {
-        JFrame frame = new JFrame("Proveedores");
-        frame.setContentPane(new ProveedoresGUI().main);
+        JFrame frame = new JFrame("Clientes");
+        frame.setContentPane(new ClientesGUI().main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);

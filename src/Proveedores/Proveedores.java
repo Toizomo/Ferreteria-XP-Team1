@@ -4,12 +4,7 @@ public class Proveedores {
     private int id_proveedor;
     private String nombre;
     private String contacto;
-
-    public Proveedores(int id_proveedor, String nombre, String contacto) {
-        this.id_proveedor = id_proveedor;
-        this.nombre = nombre;
-        this.contacto = contacto;
-    }
+    private String categoria_producto;
 
     public int getId_proveedor() {
         return id_proveedor;
@@ -33,5 +28,13 @@ public class Proveedores {
 
     public void setContacto(String contacto) {
         this.contacto = contacto;
+    }
+
+    public String getCategoria_producto() {
+        return categoria_producto;
+    }
+
+    public void setCategoria_producto(String categoria_producto) {
+        this.categoria_producto = categoria_producto;
     }
 }
