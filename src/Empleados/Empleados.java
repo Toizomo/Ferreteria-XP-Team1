@@ -1,20 +1,38 @@
 package Empleados;
 
+import java.time.LocalDate;
+
 public class Empleados {
     private int id_empleado;
     private String nombre;
-    private String cargo; // enum: administrador o vendedor
+    private String dni;
+    private String telefono;
+    private String email;
+    private String cargo; // ADMINISTRADOR, VENDEDOR, ALMACENERO, CAJERO, REPARTIDOR
     private double salario;
+    private LocalDate fecha_contratacion;
+    private String estado; // ACTIVO, INACTIVO
+    private String usuario;
+    private String contrasena;
 
-    // Constructor vacío
+    // Constructores
     public Empleados() {}
 
-    // Constructor con parámetros
-    public Empleados(int id_empleado, String nombre, String cargo, double salario) {
+    public Empleados(int id_empleado, String nombre, String dni, String telefono,
+                     String email, String cargo, double salario,
+                     LocalDate fecha_contratacion, String estado,
+                     String usuario, String contrasena) {
         this.id_empleado = id_empleado;
         this.nombre = nombre;
+        this.dni = dni;
+        this.telefono = telefono;
+        this.email = email;
         this.cargo = cargo;
         this.salario = salario;
+        this.fecha_contratacion = fecha_contratacion;
+        this.estado = estado;
+        this.usuario = usuario;
+        this.contrasena = contrasena;
     }
 
     // Getters y Setters
@@ -26,27 +44,20 @@ public class Empleados {
         this.id_empleado = id_empleado;
     }
 
-    public String getNombre() {
-        return nombre;
+    // ... (implementar todos los getters y setters para los demás campos)
+
+    // Método para verificar si el empleado tiene permiso de administrador
+    public boolean esAdministrador() {
+        return "ADMINISTRADOR".equals(this.cargo);
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    // Método para verificar si el empleado puede realizar ventas
+    public boolean puedeVender() {
+        return "ADMINISTRADOR".equals(this.cargo) || "VENDEDOR".equals(this.cargo) || "CAJERO".equals(this.cargo);
     }
 
-    public String getCargo() {
-        return cargo;
-    }
-
-    public void setCargo(String cargo) {
-        this.cargo = cargo;
-    }
-
-    public double getSalario() {
-        return salario;
-    }
-
-    public void setSalario(double salario) {
-        this.salario = salario;
+    // Método para verificar si el empleado puede gestionar inventario
+    public boolean puedeGestionarInventario() {
+        return "ADMINISTRADOR".equals(this.cargo) || "ALMACENERO".equals(this.cargo);
     }
 }
