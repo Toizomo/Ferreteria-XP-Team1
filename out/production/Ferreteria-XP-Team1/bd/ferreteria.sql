@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 27-03-2025 a las 20:22:20
+-- Tiempo de generación: 03-04-2025 a las 19:42:13
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -30,9 +30,9 @@ SET time_zone = "+00:00";
 CREATE TABLE `clientes` (
   `id_cliente` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
-  `telefono` varchar(50) DEFAULT NULL,
-  `direccion` varchar(50) DEFAULT NULL,
-  `correo` varchar(50) DEFAULT NULL
+  `telefono` varchar(50) NOT NULL,
+  `direccion` varchar(50) NOT NULL,
+  `correo` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -40,8 +40,14 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `nombre`, `telefono`, `direccion`, `correo`) VALUES
-(1, 'Juan Pérez', '123456789', 'Calle 1 #23', 'juan@mail.com'),
-(2, 'María López', '987654321', 'Avenida 5 #12', 'maria@mail.com');
+(1, 'david', '312231', 'calle 23', 'dasd@cas.com'),
+(5, 'julian', '3125554355', 'calle32-44', 'juli231@gmail.com'),
+(6, 'jackoveraso', '2234213213', 'juanl', 'btr3tgr4'),
+(7, 'alan', '2344444', 'penonsioooo', 'qwer'),
+(8, 'cuanua', '2332432424', 'ooo', 'ttt'),
+(9, 'alan', '2344444', 'penonsioooo', 'qwer'),
+(10, 'jack', '123', 'esgay', 'cierto'),
+(11, 'wenuu', '12321313', 'colosus', 'opalo');
 
 -- --------------------------------------------------------
 
@@ -52,7 +58,7 @@ INSERT INTO `clientes` (`id_cliente`, `nombre`, `telefono`, `direccion`, `correo
 CREATE TABLE `empleados` (
   `id_empleado` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
-  `cargo` enum('administrador','vendedor') NOT NULL,
+  `cargo` varchar(50) DEFAULT NULL,
   `salario` float(8,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -61,8 +67,8 @@ CREATE TABLE `empleados` (
 --
 
 INSERT INTO `empleados` (`id_empleado`, `nombre`, `cargo`, `salario`) VALUES
-(1, 'Carlos Gómez', 'administrador', 3500.50),
-(2, 'Ana Torres', 'vendedor', 2500.00);
+(1, 'Alojo', 'Empleado', 350000.00),
+(4, 'Jhoan', 'Empleado', 200000.00);
 
 -- --------------------------------------------------------
 
@@ -72,20 +78,12 @@ INSERT INTO `empleados` (`id_empleado`, `nombre`, `cargo`, `salario`) VALUES
 
 CREATE TABLE `inventario_productos` (
   `id_producto` int(11) NOT NULL,
-  `categoria_producto` enum('herramienta','electricos') NOT NULL,
   `nombre_producto` varchar(50) NOT NULL,
-  `precio_producto` float(8,2) NOT NULL,
+  `categoria` varchar(50) NOT NULL,
   `cantidad_stock` int(11) NOT NULL,
-  `id_proveedor` int(11) DEFAULT NULL
+  `precio_producto` int(11) NOT NULL,
+  `id_proveedor_asociado` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `inventario_productos`
---
-
-INSERT INTO `inventario_productos` (`id_producto`, `categoria_producto`, `nombre_producto`, `precio_producto`, `cantidad_stock`, `id_proveedor`) VALUES
-(1, 'herramienta', 'Taladro', 120.99, 10, 1),
-(2, 'electricos', 'Lámpara LED', 35.50, 50, 2);
 
 -- --------------------------------------------------------
 
@@ -95,22 +93,12 @@ INSERT INTO `inventario_productos` (`id_producto`, `categoria_producto`, `nombre
 
 CREATE TABLE `ordenes_compra` (
   `id_orden_compra` int(11) NOT NULL,
-  `id_cliente` int(11) DEFAULT NULL,
-  `id_empleado` int(11) DEFAULT NULL,
-  `id_producto` int(11) DEFAULT NULL,
+  `id_cliente` int(11) NOT NULL,
+  `id_empleado` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
   `estado_orden` enum('pendiente','pagada','enviada') NOT NULL,
   `fecha_compra` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `ordenes_compra`
---
-
-INSERT INTO `ordenes_compra` (`id_orden_compra`, `id_cliente`, `id_empleado`, `id_producto`, `estado_orden`, `fecha_compra`) VALUES
-(1, 1, 1, 1, 'pendiente', '2025-03-27 15:39:54'),
-(2, 2, 2, 2, 'pagada', '2025-03-27 15:39:54'),
-(3, 1, 1, 1, 'pendiente', '2025-03-27 15:39:54'),
-(4, 2, 2, 2, 'pagada', '2025-03-27 15:39:54');
 
 -- --------------------------------------------------------
 
@@ -121,16 +109,18 @@ INSERT INTO `ordenes_compra` (`id_orden_compra`, `id_cliente`, `id_empleado`, `i
 CREATE TABLE `proveedores` (
   `id_proveedor` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
-  `contacto` varchar(50) DEFAULT NULL
+  `contacto` varchar(50) NOT NULL,
+  `categoria_producto` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `proveedores`
 --
 
-INSERT INTO `proveedores` (`id_proveedor`, `nombre`, `contacto`) VALUES
-(1, 'Proveedor A', 'contactoA@mail.com'),
-(2, 'Proveedor B', 'contactoB@mail.com');
+INSERT INTO `proveedores` (`id_proveedor`, `nombre`, `contacto`, `categoria_producto`) VALUES
+(1, 'asd', '12345', 'herramientas'),
+(4, 'Karol Arbelaez', '31123441', 'Clavos'),
+(5, 'Quico', '5671222132', 'Maquinaria');
 
 -- --------------------------------------------------------
 
@@ -140,17 +130,9 @@ INSERT INTO `proveedores` (`id_proveedor`, `nombre`, `contacto`) VALUES
 
 CREATE TABLE `registro_ventas` (
   `id_venta` int(11) NOT NULL,
-  `id_orden_compra` int(11) DEFAULT NULL,
+  `id_orden_compra` int(11) NOT NULL,
   `total` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `registro_ventas`
---
-
-INSERT INTO `registro_ventas` (`id_venta`, `id_orden_compra`, `total`) VALUES
-(1, 1, 120),
-(2, 2, 35);
 
 --
 -- Índices para tablas volcadas
@@ -173,7 +155,7 @@ ALTER TABLE `empleados`
 --
 ALTER TABLE `inventario_productos`
   ADD PRIMARY KEY (`id_producto`),
-  ADD KEY `id_proveedor` (`id_proveedor`);
+  ADD KEY `id_proveedor_asociado` (`id_proveedor_asociado`);
 
 --
 -- Indices de la tabla `ordenes_compra`
@@ -205,37 +187,37 @@ ALTER TABLE `registro_ventas`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  MODIFY `id_empleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_empleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario_productos`
 --
 ALTER TABLE `inventario_productos`
-  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `ordenes_compra`
 --
 ALTER TABLE `ordenes_compra`
-  MODIFY `id_orden_compra` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_orden_compra` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedores`
 --
 ALTER TABLE `proveedores`
-  MODIFY `id_proveedor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_proveedor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `registro_ventas`
 --
 ALTER TABLE `registro_ventas`
-  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -245,21 +227,21 @@ ALTER TABLE `registro_ventas`
 -- Filtros para la tabla `inventario_productos`
 --
 ALTER TABLE `inventario_productos`
-  ADD CONSTRAINT `inventario_productos_ibfk_1` FOREIGN KEY (`id_proveedor`) REFERENCES `proveedores` (`id_proveedor`) ON DELETE SET NULL;
+  ADD CONSTRAINT `inventario_productos_ibfk_1` FOREIGN KEY (`id_proveedor_asociado`) REFERENCES `proveedores` (`id_proveedor`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `ordenes_compra`
 --
 ALTER TABLE `ordenes_compra`
-  ADD CONSTRAINT `ordenes_compra_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE,
-  ADD CONSTRAINT `ordenes_compra_ibfk_2` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON DELETE SET NULL,
-  ADD CONSTRAINT `ordenes_compra_ibfk_3` FOREIGN KEY (`id_producto`) REFERENCES `inventario_productos` (`id_producto`) ON DELETE SET NULL;
+  ADD CONSTRAINT `ordenes_compra_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `ordenes_compra_ibfk_2` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `ordenes_compra_ibfk_3` FOREIGN KEY (`id_producto`) REFERENCES `inventario_productos` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `registro_ventas`
 --
 ALTER TABLE `registro_ventas`
-  ADD CONSTRAINT `registro_ventas_ibfk_1` FOREIGN KEY (`id_orden_compra`) REFERENCES `ordenes_compra` (`id_orden_compra`) ON DELETE CASCADE;
+  ADD CONSTRAINT `registro_ventas_ibfk_1` FOREIGN KEY (`id_orden_compra`) REFERENCES `ordenes_compra` (`id_orden_compra`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

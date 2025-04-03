@@ -15,6 +15,14 @@ public class Clientes {
         this.correo = correo;
     }
 
+    public int getId_clientes() {
+        return id_clientes;
+    }
+
+    public void setId_clientes(int id_clientes) {
+        this.id_clientes = id_clientes;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -23,19 +31,19 @@ public class Clientes {
         this.nombre = nombre;
     }
 
-    public String gettelefono() {
+    public String getTelefono() {
         return telefono;
     }
 
-    public void settelefono(String telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
 
-    public String getdireccion() {
+    public String getDireccion() {
         return direccion;
     }
 
-    public void setdireccion(String direccion) {
+    public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
 

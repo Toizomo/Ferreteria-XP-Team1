@@ -1,33 +1,29 @@
 package Inventario;
 
 public class Inventario {
-    private int id_producto;
-    private String nombre_producto;
-    private String categoria;
-    private int cantidad_stock;
-    private double precio_venta;
-    private int id_proveedor;
-    private String nombre_proveedor; // Para mostrar en la interfaz
-    private int stock_minimo;
-    private String estado;
 
-    // Constructores
-    public Inventario() {}
+    private int id_producto;
+
+    private String nombre_producto;
+
+    private String categoria;
+
+    private int cantidad_stock;
+
+    private int precio_producto;
+
+    private Integer id_proveedor_asociado;
 
     public Inventario(int id_producto, String nombre_producto, String categoria,
-                      int cantidad_stock, double precio_venta, int id_proveedor,
-                      int stock_minimo, String estado) {
+                      int cantidad_stock, int precio_producto, Integer id_proveedor_asociado) {
         this.id_producto = id_producto;
         this.nombre_producto = nombre_producto;
         this.categoria = categoria;
         this.cantidad_stock = cantidad_stock;
-        this.precio_venta = precio_venta;
-        this.id_proveedor = id_proveedor;
-        this.stock_minimo = stock_minimo;
-        this.estado = estado;
+        this.precio_producto = precio_producto;
+        this.id_proveedor_asociado = id_proveedor_asociado;
     }
 
-    // Getters y Setters
     public int getId_producto() {
         return id_producto;
     }
@@ -44,10 +40,35 @@ public class Inventario {
         this.nombre_producto = nombre_producto;
     }
 
-    // ... (implementar todos los getters y setters para los demás campos)
+    public String getCategoria() {
+        return categoria;
+    }
 
-    // Método para verificar si el stock está bajo
-    public boolean isStockBajo() {
-        return cantidad_stock < stock_minimo;
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public int getCantidad_stock() {
+        return cantidad_stock;
+    }
+
+    public void setCantidad_stock(int cantidad_stock) {
+        this.cantidad_stock = cantidad_stock;
+    }
+
+    public int getPrecio_producto() {
+        return precio_producto;
+    }
+
+    public void setPrecio_producto(int precio_producto) {
+        this.precio_producto = precio_producto;
+    }
+
+    public Integer getId_proveedor_asociado() {
+        return id_proveedor_asociado;
+    }
+
+    public void setId_proveedor_asociado(Integer id_proveedor_asociado) {
+        this.id_proveedor_asociado = id_proveedor_asociado;
     }
 }
