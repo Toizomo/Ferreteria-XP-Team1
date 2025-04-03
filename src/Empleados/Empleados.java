@@ -6,9 +6,6 @@ public class Empleados {
     private String cargo; // enum: administrador o vendedor
     private double salario;
 
-    // Constructor vacío
-    public Empleados() {}
-
     // Constructor con parámetros
     public Empleados(int id_empleado, String nombre, String cargo, double salario) {
         this.id_empleado = id_empleado;
