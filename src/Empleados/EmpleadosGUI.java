@@ -19,7 +19,7 @@ public class EmpleadosGUI {
     private JTable table1;
     private JTextField textField1;
     private JTextField textField2;
-    private JComboBox comboBox1;
+    private JComboBox<String> comboBox1;
     private JTextField textField3;
     private JButton agregarButton;
     private JButton actualizarButton;
@@ -39,7 +39,7 @@ public class EmpleadosGUI {
                 double salario = Double.parseDouble(textField3.getText());
                 Empleados Empleados = new Empleados(0, nombre, cargo, salario);
                 EmpleadosDAO.insertarEmpleado(Empleados);
-
+                mostrar();
             }
         });
 
@@ -52,6 +52,7 @@ public class EmpleadosGUI {
                 int id_empleado = Integer.parseInt(textField1.getText());
                 Empleados Empleados = new Empleados(id_empleado, nombre, cargo, salario);
                 EmpleadosDAO.actualizarEmpleado(Empleados);
+                mostrar();
 
             }
         });
@@ -61,6 +62,7 @@ public class EmpleadosGUI {
             public void actionPerformed(ActionEvent e) {
                 int id_empleado = Integer.parseInt(textField1.getText());
                 EmpleadosDAO.eliminarEmpleado(id_empleado);
+                mostrar();
             }
         });
         table1.addMouseListener(new MouseAdapter()
@@ -73,9 +75,10 @@ public class EmpleadosGUI {
 
                 if (selectFila >= 0)
                 {
-                    textField1.setText(String.valueOf(table1.getValueAt(selectFila, 0)));
-                    textField2.setText((String) table1.getValueAt(selectFila, 1));
-                    textField3.setText((String) table1.getValueAt(selectFila, 2));
+                    textField1.setText(String.valueOf(table1.getValueAt(selectFila, 0))); // ID Empleado
+                    textField2.setText((String) table1.getValueAt(selectFila, 1)); // Nombre
+                    comboBox1.setSelectedItem((String) table1.getValueAt(selectFila, 2)); // Cargo
+                    textField3.setText(String.valueOf(table1.getValueAt(selectFila, 3)));
 
                     filas = selectFila;
                 }
