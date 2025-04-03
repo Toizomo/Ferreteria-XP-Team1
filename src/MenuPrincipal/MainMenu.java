@@ -2,7 +2,7 @@ package MenuPrincipal;
 
 import Clientes.ClientesGUI;
 import Empleados.EmpleadosGUI;
-//import Inventario.InventarioGUI;
+import Inventario.InventarioGUI;
 import Proveedores.ProveedoresGUI;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +12,7 @@ public class MainMenu {
     private JPanel main;
     private JButton clientesMenu;
     private JButton empleadosMenu;
-    //    private JButton inventariosMenu;
+    private JButton inventariosMenu;
     private JButton ordenesCompraMenu;
     private JButton proveedoresMenu;
 
@@ -24,12 +24,12 @@ public class MainMenu {
         // Crear botones y añadirlos al panel
         clientesMenu = new JButton("Clientes");
         empleadosMenu = new JButton("Empleados");
-        // inventariosMenu = new JButton("Inventarios");
+        inventariosMenu = new JButton("Inventarios");
         proveedoresMenu = new JButton("Proveedores");
 
         main.add(clientesMenu);
         main.add(empleadosMenu);
-        // main.add(inventariosMenu);
+        main.add(inventariosMenu);
         main.add(proveedoresMenu);
 
         // Añadir acciones a los botones
@@ -42,14 +42,6 @@ public class MainMenu {
             }
         });
 
-//        inventariosMenu.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(inventariosMenu);
-//                jFrame.dispose();
-//                InventarioGUI.main(null);
-//            }
-//        });
 
         empleadosMenu.addActionListener(new ActionListener() {
             @Override
@@ -66,6 +58,15 @@ public class MainMenu {
                 JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(proveedoresMenu);
                 jFrame.dispose();
                 ProveedoresGUI.main(null);
+            }
+        });
+
+        inventariosMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame jframe = (JFrame) SwingUtilities.getWindowAncestor(inventariosMenu);
+                jframe.dispose();
+                InventarioGUI.main(null);
             }
         });
     }
