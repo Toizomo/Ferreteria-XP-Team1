@@ -1,7 +1,5 @@
-package Proveedores;
+package Empleados;
 
-import Clientes.ClientesDAO;
-import Clientes.ClientesGUI;
 import Conexion.ConexionBD;
 
 import javax.swing.*;
@@ -14,61 +12,57 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 
-public class ProveedoresGUI {
+public class EmpleadosGUI {
     private JPanel main;
     private JTable table1;
     private JTextField textField1;
     private JTextField textField2;
+    private JComboBox comboBox1;
     private JTextField textField3;
-    private JTextField textField4;
     private JButton agregarButton;
     private JButton actualizarButton;
     private JButton eliminarButton;
-    ProveedoresDAO ProveedoresDAO = new ProveedoresDAO();
+    EmpleadosDAO EmpleadosDAO = new EmpleadosDAO();
     ConexionBD ConexionBD = new ConexionBD();
     int filas = 0;
 
-
-    public ProveedoresGUI()
-    {
+    public EmpleadosGUI() {
         mostrar();
+
         agregarButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 String nombre = textField2.getText();
-                String contacto = textField3.getText();
-                String productos_suministrados = textField4.getText();
-                Proveedores Proveedores = new Proveedores(0, nombre, contacto, productos_suministrados);
-                ProveedoresDAO.agregar(Proveedores);
+                String cargo = Objects.requireNonNull(comboBox1.getSelectedItem()).toString();
+                double salario = Double.parseDouble(textField3.getText());
+                Empleados Empleados = new Empleados(0, nombre, cargo, salario);
+                EmpleadosDAO.insertarEmpleado(Empleados);
+
             }
         });
 
-        actualizarButton.addActionListener(new ActionListener()
-        {
+        actualizarButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 String nombre = textField2.getText();
-                String contacto = textField3.getText();
-                String productos_suministrados = textField4.getText();
-                int id_proveedor = Integer.parseInt(textField1.getText());
-                Proveedores Proveedores = new Proveedores(id_proveedor, nombre, contacto, productos_suministrados);
-                ProveedoresDAO.actualizar(Proveedores);
+                String cargo = Objects.requireNonNull(comboBox1.getSelectedItem()).toString();
+                double salario = Double.parseDouble(textField3.getText());
+                int id_empleado = Integer.parseInt(textField1.getText());
+                Empleados Empleados = new Empleados(id_empleado, nombre, cargo, salario);
+                EmpleadosDAO.actualizarEmpleado(Empleados);
+
             }
         });
 
-        eliminarButton.addActionListener(new ActionListener()
-        {
+        eliminarButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                int id_proveedor = Integer.parseInt(textField1.getText());
-                ProveedoresDAO.eliminar(id_proveedor);
+            public void actionPerformed(ActionEvent e) {
+                int id_empleado = Integer.parseInt(textField1.getText());
+                EmpleadosDAO.eliminarEmpleado(id_empleado);
             }
         });
-
         table1.addMouseListener(new MouseAdapter()
         {
             @Override
@@ -82,7 +76,6 @@ public class ProveedoresGUI {
                     textField1.setText(String.valueOf(table1.getValueAt(selectFila, 0)));
                     textField2.setText((String) table1.getValueAt(selectFila, 1));
                     textField3.setText((String) table1.getValueAt(selectFila, 2));
-                    textField4.setText((String) table1.getValueAt(selectFila, 3));
 
                     filas = selectFila;
                 }
@@ -93,10 +86,10 @@ public class ProveedoresGUI {
     public void mostrar()
     {
         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID Proveedor");
+        model.addColumn("ID Empleado");
         model.addColumn("Nombre");
-        model.addColumn("Contacto");
-        model.addColumn("Producto Suministrado");
+        model.addColumn("Cargo");
+        model.addColumn("Salario");
 
         table1.setModel(model);
         String[] dato = new String[4];
@@ -104,7 +97,7 @@ public class ProveedoresGUI {
 
         try {
             Statement stat = con.createStatement();
-            String query = "SELECT * FROM proveedores";
+            String query = "SELECT * FROM empleados";
             ResultSet fb = stat.executeQuery(query);
 
             while (fb.next())
@@ -125,8 +118,8 @@ public class ProveedoresGUI {
 
     public static void main(String[] args)
     {
-        JFrame frame = new JFrame("Proveedores");
-        frame.setContentPane(new ProveedoresGUI().main);
+        JFrame frame = new JFrame("Empleados");
+        frame.setContentPane(new EmpleadosGUI().main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
