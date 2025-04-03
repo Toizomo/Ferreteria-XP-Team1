@@ -11,7 +11,8 @@ public class ConexionBD
 
         try
         {
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ferreteria","root","");
+            Class.forName("com.mysql.cj.jdbc.Driver"); // Cargar el driver
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ferreteria", "root", "");
         }
         catch (Exception e)
         {
@@ -21,3 +22,4 @@ public class ConexionBD
         return con;
     }
 }
+
