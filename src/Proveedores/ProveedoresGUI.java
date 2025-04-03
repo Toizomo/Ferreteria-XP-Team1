@@ -1,8 +1,7 @@
 package Proveedores;
 
-import Clientes.ClientesDAO;
-import Clientes.ClientesGUI;
 import Conexion.ConexionBD;
+import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -25,6 +24,7 @@ public class ProveedoresGUI {
     private JButton agregarButton;
     private JButton actualizarButton;
     private JButton eliminarButton;
+    private JButton volverButton;
     ProveedoresDAO ProveedoresDAO = new ProveedoresDAO();
     ConexionBD ConexionBD = new ConexionBD();
     int filas = 0;
@@ -88,6 +88,16 @@ public class ProveedoresGUI {
                 }
             }
         });
+
+        volverButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
+                jFrame.dispose();
+                MenuPrincipal.main(null);
+            }
+        });
+
     }
 
     public void mostrar()

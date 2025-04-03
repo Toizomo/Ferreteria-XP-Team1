@@ -1,6 +1,7 @@
 package Clientes;
 
 import Conexion.ConexionBD;
+import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -24,6 +25,7 @@ public class ClientesGUI {
     private JButton actualizarButton;
     private JButton eliminarButton;
     private JTextField textField5;
+    private JButton volverButton;
     ClientesDAO ClientesDAO = new ClientesDAO();
     ConexionBD ConexionBD = new ConexionBD();
     int filas = 0;
@@ -91,6 +93,17 @@ public class ClientesGUI {
                 }
             }
         });
+
+        volverButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
+                jFrame.dispose();
+                MenuPrincipal.main(null);
+            }
+        });
+
+
     }
 
     public void mostrar()
