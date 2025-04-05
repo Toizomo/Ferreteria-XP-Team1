@@ -3,6 +3,7 @@ package MenuPrincipal;
 import Clientes.ClientesGUI;
 import Empleados.EmpleadosGUI;
 import Inventario.InventarioGUI;
+import Orden_Compras.OrdenesCompra.OrdenesCompraGUI;
 import Proveedores.ProveedoresGUI;
 import javax.swing.*;
 import java.awt.*;
@@ -107,6 +108,15 @@ public class MenuPrincipal {
                 JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(empleadosButton);
                 jFrame.dispose();
                 EmpleadosGUI.main(null);
+            }
+        });
+
+        ordenesCompraButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(ordenesCompraButton);
+                jFrame.dispose();
+                OrdenesCompraGUI.main(null);
             }
         });
 
