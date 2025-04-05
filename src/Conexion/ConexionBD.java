@@ -21,5 +21,9 @@ public class ConexionBD
 
         return con;
     }
+
+    public Connection getConnection() {
+        return null;
+    }
 }
 
