@@ -120,6 +120,8 @@ public class MenuPrincipal {
             }
         });
 
+
+
         // Configurar el JFrame
         JFrame frame = new JFrame("Menú Principal");
         frame.setContentPane(main);
