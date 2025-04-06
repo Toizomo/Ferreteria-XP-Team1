@@ -1,7 +1,7 @@
 package Inventario;
 
 import Conexion.ConexionBD;
-import MenuPrincipal.MainMenu;
+import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -113,7 +113,7 @@ public class InventarioGUI {
             public void actionPerformed(ActionEvent e) {
                 JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
                 jFrame.dispose();
-                MainMenu.main(null);
+                MenuPrincipal.main(null);
             }
         });
     }

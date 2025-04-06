@@ -1,6 +1,7 @@
 package Empleados;
 
 import Conexion.ConexionBD;
+import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -24,6 +25,7 @@ public class EmpleadosGUI {
     private JButton agregarButton;
     private JButton actualizarButton;
     private JButton eliminarButton;
+    private JButton volverButton;
     EmpleadosDAO EmpleadosDAO = new EmpleadosDAO();
     ConexionBD ConexionBD = new ConexionBD();
     int filas = 0;
@@ -65,6 +67,9 @@ public class EmpleadosGUI {
                 mostrar();
             }
         });
+
+
+
         table1.addMouseListener(new MouseAdapter()
         {
             @Override
@@ -84,6 +89,16 @@ public class EmpleadosGUI {
                 }
             }
         });
+
+        volverButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
+                jFrame.dispose();
+                MenuPrincipal.main(null);
+            }
+        });
+
     }
 
     public void mostrar()
