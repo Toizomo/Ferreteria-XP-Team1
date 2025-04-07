@@ -53,6 +53,8 @@ public class MenuPrincipal {
         empleadosButton = new JButton("Empleados");
         ordenesCompraButton = new JButton("Órdenes de Compra");
 
+
+
         // Personalización de los botones
         customizeButton(clientesButton, new Color(70, 130, 180)); // Naranja
         customizeButton(inventarioButton, new Color(70, 130, 180)); // Azul
