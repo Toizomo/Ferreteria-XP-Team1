@@ -4,56 +4,88 @@ import Conexion.ConexionBD;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Objects;
+import java.time.LocalDate;
 
 public class EmpleadosGUI {
     private JPanel main;
     private JTable table1;
-    private JTextField textField1;
-    private JTextField textField2;
-    private JComboBox<String> comboBox1;
-    private JTextField textField3;
+    private JTextField textField1; // ID
+    private JTextField textField2; // Nombre
+    private JComboBox<String> comboBox1; // Cargo
+    private JTextField textField3; // Salario
     private JButton agregarButton;
     private JButton actualizarButton;
     private JButton eliminarButton;
-    EmpleadosDAO EmpleadosDAO = new EmpleadosDAO();
-    ConexionBD ConexionBD = new ConexionBD();
+    EmpleadosDAO empleadosDAO = new EmpleadosDAO();
+    ConexionBD conexionBD = new ConexionBD();
     int filas = 0;
 
     public EmpleadosGUI() {
+        // Puedes agregar más opciones si lo deseas
+        comboBox1.addItem("Gerente");
+        comboBox1.addItem("Desarrollador");
+        comboBox1.addItem("Analista");
+        comboBox1.addItem("Soporte");
+
         mostrar();
 
         agregarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String nombre = textField2.getText();
-                String cargo = Objects.requireNonNull(comboBox1.getSelectedItem()).toString();
+                String cargo = comboBox1.getSelectedItem().toString();
                 double salario = Double.parseDouble(textField3.getText());
-                Empleados Empleados = new Empleados(0, nombre, cargo, salario);
-                EmpleadosDAO.insertarEmpleado(Empleados);
+
+                Empleados empleados = new Empleados(
+                        0,
+                        nombre,
+                        cargo,
+                        "0000000000",         // teléfono por defecto
+                        "email@ejemplo.com",  // email por defecto
+                        cargo,
+                        salario,
+                        LocalDate.now(),      // fecha actual
+                        "Activo",             // estado por defecto
+                        "usuario",            // usuario por defecto
+                        "contrasena"          // contraseña por defecto
+                );
+
+                empleadosDAO.insertarEmpleado(empleados);
                 mostrar();
+                limpiarCampos();
             }
         });
 
         actualizarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String nombre = textField2.getText();
-                String cargo = Objects.requireNonNull(comboBox1.getSelectedItem()).toString();
-                double salario = Double.parseDouble(textField3.getText());
                 int id_empleado = Integer.parseInt(textField1.getText());
-                Empleados Empleados = new Empleados(id_empleado, nombre, cargo, salario);
-                EmpleadosDAO.actualizarEmpleado(Empleados);
-                mostrar();
+                String nombre = textField2.getText();
+                String cargo = comboBox1.getSelectedItem().toString();
+                double salario = Double.parseDouble(textField3.getText());
 
+                Empleados empleados = new Empleados(
+                        id_empleado,
+                        nombre,
+                        cargo,
+                        "0000000000",
+                        "email@ejemplo.com",
+                        cargo,
+                        salario,
+                        LocalDate.now(),
+                        "Activo",
+                        "usuario",
+                        "contrasena"
+                );
+
+                empleadosDAO.actualizarEmpleado(empleados);
+                mostrar();
+                limpiarCampos();
             }
         });
 
@@ -61,33 +93,30 @@ public class EmpleadosGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int id_empleado = Integer.parseInt(textField1.getText());
-                EmpleadosDAO.eliminarEmpleado(id_empleado);
+                empleadosDAO.eliminarEmpleado(id_empleado);
                 mostrar();
+                limpiarCampos();
             }
         });
-        table1.addMouseListener(new MouseAdapter()
-        {
+
+        table1.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e)
-            {
+            public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                int selectFila = table1.getSelectedRow();
+                int filaSeleccionada = table1.getSelectedRow();
 
-                if (selectFila >= 0)
-                {
-                    textField1.setText(String.valueOf(table1.getValueAt(selectFila, 0))); // ID Empleado
-                    textField2.setText((String) table1.getValueAt(selectFila, 1)); // Nombre
-                    comboBox1.setSelectedItem((String) table1.getValueAt(selectFila, 2)); // Cargo
-                    textField3.setText(String.valueOf(table1.getValueAt(selectFila, 3)));
-
-                    filas = selectFila;
+                if (filaSeleccionada >= 0) {
+                    textField1.setText(String.valueOf(table1.getValueAt(filaSeleccionada, 0)));
+                    textField2.setText((String) table1.getValueAt(filaSeleccionada, 1));
+                    comboBox1.setSelectedItem((String) table1.getValueAt(filaSeleccionada, 2));
+                    textField3.setText(String.valueOf(table1.getValueAt(filaSeleccionada, 3)));
+                    filas = filaSeleccionada;
                 }
             }
         });
     }
 
-    public void mostrar()
-    {
+    public void mostrar() {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Empleado");
         model.addColumn("Nombre");
@@ -96,37 +125,40 @@ public class EmpleadosGUI {
 
         table1.setModel(model);
         String[] dato = new String[4];
-        Connection con = ConexionBD.getconnection();
+        Connection con = conexionBD.getconnection();
 
         try {
             Statement stat = con.createStatement();
-            String query = "SELECT * FROM empleados";
-            ResultSet fb = stat.executeQuery(query);
+            String query = "SELECT id_empleado, nombre, cargo, salario FROM empleados";
+            ResultSet rs = stat.executeQuery(query);
 
-            while (fb.next())
-            {
-                dato[0] = fb.getString(1);
-                dato[1] = fb.getString(2);
-                dato[2] = fb.getString(3);
-                dato[3] = fb.getString(4);
+            while (rs.next()) {
+                dato[0] = rs.getString("id_empleado");
+                dato[1] = rs.getString("nombre");
+                dato[2] = rs.getString("cargo");
+                dato[3] = rs.getString("salario");
 
                 model.addRow(dato);
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args)
-    {
+    private void limpiarCampos() {
+        textField1.setText("");
+        textField2.setText("");
+        textField3.setText("");
+        comboBox1.setSelectedIndex(0);
+    }
+
+    public static void main(String[] args) {
         JFrame frame = new JFrame("Empleados");
         frame.setContentPane(new EmpleadosGUI().main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-        frame.setSize(880,700);
+        frame.setSize(880, 700);
         frame.setResizable(false);
     }
 }

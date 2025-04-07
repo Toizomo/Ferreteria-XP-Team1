@@ -4,11 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 
 public class JPanelBackground extends JPanel {
+    private Image imagenFondo;
+
+    public JPanelBackground() {
+        // Cambia la ruta a la imagen según donde la tengas guardada
+        ImageIcon icon = new ImageIcon("src/MenuPrincipal/fondo_menu.png");
+        imagenFondo = icon.getImage();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Aquí puedes dibujar un color de fondo o cualquier otro componente si lo deseas
-        g.setColor(Color.LIGHT_GRAY); // Color de fondo
-        g.fillRect(0, 0, getWidth(), getHeight()); // Rellenar el panel con el color
+        if (imagenFondo != null) {
+            g.drawImage(imagenFondo, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }

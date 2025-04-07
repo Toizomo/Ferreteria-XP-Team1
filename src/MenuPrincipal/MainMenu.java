@@ -18,7 +18,7 @@ public class MainMenu {
 
     public MainMenu() {
         // Inicializar el panel principal
-        main = new JPanel();
+        main = new JPanelBackground();
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS)); // Usar un layout vertical
 
         // Crear botones y añadirlos al panel

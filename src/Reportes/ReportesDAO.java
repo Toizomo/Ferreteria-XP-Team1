@@ -1,6 +1,6 @@
 package Reportes;
 
-import util.ConexionBD;
+import Conexion.ConexionBD;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,10 +9,12 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 public class ReportesDAO {
+
     private final Connection conexion;
 
+
     public ReportesDAO() {
-        this.conexion = new ConexionBD().getConnection();
+        this.conexion = new ConexionBD().getconnection();
     }
 
     // Reporte 1: Ventas por período

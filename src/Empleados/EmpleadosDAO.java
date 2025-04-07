@@ -1,8 +1,7 @@
 package Empleados;
 
-import util.ConexionBD;
+import Conexion.ConexionBD;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -11,7 +10,67 @@ public class EmpleadosDAO {
     private final Connection conexion;
 
     public EmpleadosDAO() {
-        this.conexion = new ConexionBD().getConnection();
+        this.conexion = new ConexionBD().getconnection();
+    }
+
+    // Método para insertar empleado
+    public boolean insertarEmpleado(Empleados empleado) {
+        String sql = "INSERT INTO empleados (nombre, dni, telefono, email, cargo, salario, fecha_contratacion, estado, usuario, contrasena) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, SHA2(?, 256))";
+
+        try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+            pst.setString(1, empleado.getNombre());
+            pst.setString(2, empleado.getDni());
+            pst.setString(3, empleado.getTelefono());
+            pst.setString(4, empleado.getEmail());
+            pst.setString(5, empleado.getCargo());
+            pst.setDouble(6, empleado.getSalario());
+            pst.setDate(7, java.sql.Date.valueOf(empleado.getFecha_contratacion()));
+            pst.setString(8, empleado.getEstado());
+            pst.setString(9, empleado.getUsuario());
+            pst.setString(10, empleado.getContrasena());
+
+            return pst.executeUpdate() > 0;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al insertar empleado: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Método para actualizar empleado
+    public boolean actualizarEmpleado(Empleados empleado) {
+        String sql = "UPDATE empleados SET nombre=?, dni=?, telefono=?, email=?, cargo=?, salario=?, fecha_contratacion=?, estado=?, usuario=?, contrasena=SHA2(?, 256) WHERE id_empleado=?";
+
+        try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+            pst.setString(1, empleado.getNombre());
+            pst.setString(2, empleado.getDni());
+            pst.setString(3, empleado.getTelefono());
+            pst.setString(4, empleado.getEmail());
+            pst.setString(5, empleado.getCargo());
+            pst.setDouble(6, empleado.getSalario());
+            pst.setDate(7, java.sql.Date.valueOf(empleado.getFecha_contratacion()));
+            pst.setString(8, empleado.getEstado());
+            pst.setString(9, empleado.getUsuario());
+            pst.setString(10, empleado.getContrasena());
+            pst.setInt(11, empleado.getId_empleado());
+
+            return pst.executeUpdate() > 0;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al actualizar empleado: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Método para eliminar empleado
+    public boolean eliminarEmpleado(int id_empleado) {
+        String sql = "DELETE FROM empleados WHERE id_empleado = ?";
+
+        try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+            pst.setInt(1, id_empleado);
+            return pst.executeUpdate() > 0;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al eliminar empleado: " + e.getMessage());
+            return false;
+        }
     }
 
     // Método para autenticar empleado
@@ -46,7 +105,7 @@ public class EmpleadosDAO {
         return null;
     }
 
-    // Método para registrar un nuevo empleado (solo administradores)
+    //Método para registrar un nuevo empleado (solo administradores)
     public boolean registrarEmpleado(Empleados empleado) {
         if (!empleadoExiste(empleado.getDni(), empleado.getUsuario())) {
             String sql = "INSERT INTO empleados (nombre, dni, telefono, email, cargo, salario, " +
@@ -139,4 +198,5 @@ public class EmpleadosDAO {
         }
         return empleados;
     }
+
 }
