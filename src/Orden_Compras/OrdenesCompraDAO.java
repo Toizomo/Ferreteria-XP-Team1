@@ -10,8 +10,8 @@ import java.sql.SQLException;
 public class OrdenesCompraDAO {
     ConexionBD conexionDB = new ConexionBD();
 
-    public void agregar(ordenesCompra ordenesCompra){
-        Connection con = conexionDB.getconnection();
+    public static void agregar(ordenesCompra ordenesCompra){
+        Connection con = ConexionBD.getconnection();
         String query = "INSERT INTO ordenes_compra (id_cliente, id_empleado, id_producto, total, estado_orden, fecha_compra) VALUES (?, ?, ?, ?, ?, ?)";
 
         try{
@@ -32,8 +32,8 @@ public class OrdenesCompraDAO {
         }
     }
 
-    public void actualizar(ordenesCompra ordenesCompra){
-        Connection con = conexionDB.getconnection();
+    public static void actualizar(ordenesCompra ordenesCompra){
+        Connection con = ConexionBD.getconnection();
         String query = "UPDATE ordenes_compra SET id_cliente = ?, id_empleado = ?, id_producto = ?, total = ?, estado_compra = ?, fecha_compra = ?";
 
         try{

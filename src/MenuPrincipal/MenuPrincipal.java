@@ -2,142 +2,113 @@ package MenuPrincipal;
 
 import Clientes.ClientesGUI;
 import Empleados.EmpleadosGUI;
+import Img.img;
 import Inventario.InventarioGUI;
 import Orden_Compras.OrdenesCompraGUI;
 import Proveedores.ProveedoresGUI;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MenuPrincipal {
-    private JPanel main; // Panel principal
+    private JPanel main;
     private JButton clientesButton;
     private JButton inventarioButton;
     private JButton proveedoresButton;
     private JButton empleadosButton;
     private JButton ordenesCompraButton;
-    private JTextPane FERETERIATextPane;
+    private JLabel ferreteriaLabel;
 
     public MenuPrincipal() {
-        // Inicializar el panel principal
-        main = new JPanel();
-        main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS)); // Usar un layout vertical
-        main.setBackground(new Color(255, 198, 45)); // Establecer el color de fondo del panel principal
+        main = new img(); // clase img que tiene el fondo
+        main.setLayout(new BorderLayout());
 
-        // Crear un panel para el JTextPane y establecer un layout centrado
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Centrar el JTextPane
-        textPanel.setBackground(new Color(239, 32, 32)); // Establecer el color de fondo del panel de texto
+        // Panel superior con los botones
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        buttonPanel.setOpaque(false); // Fondo transparente
 
-        // Inicializar el JTextPane
-        FERETERIATextPane = new JTextPane();
-        FERETERIATextPane.setText("FERETERIA"); // Texto de ejemplo
-        FERETERIATextPane.setEditable(false); // Hacerlo no editable
-        FERETERIATextPane.setPreferredSize(new Dimension(200, 30)); // Tamaño preferido
-        FERETERIATextPane.setBackground(new Color(244, 66, 66)); // Fondo del JTextPane
-        FERETERIATextPane.setForeground(Color.WHITE); // Texto en blanco
-
-        // Añadir el JTextPane al panel de texto
-        textPanel.add(FERETERIATextPane);
-
-        // Crear un panel para los botones y establecer un layout centrado
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Centrar los botones
-        buttonPanel.setBackground(new Color(255, 198, 45)); // Establecer el color de fondo del panel de botones
-
-        // Inicializar botones (suponiendo que ya los has creado en el diseñador)
+        // Crear botones
         clientesButton = new JButton("Clientes");
         inventarioButton = new JButton("Inventario");
         proveedoresButton = new JButton("Proveedores");
         empleadosButton = new JButton("Empleados");
         ordenesCompraButton = new JButton("Órdenes de Compra");
 
-        // Personalización de los botones
-        customizeButton(clientesButton, new Color(70, 130, 180)); // Naranja
-        customizeButton(inventarioButton, new Color(70, 130, 180)); // Azul
-        customizeButton(proveedoresButton, new Color(70, 130, 180)); // Verde
-        customizeButton(empleadosButton, new Color(70, 130, 180)); // Rojo
-        customizeButton(ordenesCompraButton, new Color(70, 130, 180)); // Púrpura
+        // Estilos
+        Dimension buttonSize = new Dimension(180, 50);
+        Font buttonFont = new Font("Times New Roman", Font.BOLD, 18);
+        Color buttonColor = new Color(70, 130, 180); // Azul oscuro bonito
 
-        // Añadir botones al panel de botones
+        // Personalizar botones
+        customizeButton(clientesButton, buttonColor, buttonFont, buttonSize);
+        customizeButton(inventarioButton, buttonColor, buttonFont, buttonSize);
+        customizeButton(proveedoresButton, buttonColor, buttonFont, buttonSize);
+        customizeButton(empleadosButton, buttonColor, buttonFont, buttonSize);
+        customizeButton(ordenesCompraButton, buttonColor, buttonFont, buttonSize);
+
+        // Añadir botones al panel
         buttonPanel.add(clientesButton);
         buttonPanel.add(inventarioButton);
         buttonPanel.add(proveedoresButton);
         buttonPanel.add(empleadosButton);
         buttonPanel.add(ordenesCompraButton);
 
-        // Añadir el panel de texto y el panel de botones al panel principal
-        main.add(Box.createVerticalGlue()); // Espacio flexible antes del JTextPane
-        main.add(textPanel);
-        main.add(Box.createRigidArea(new Dimension(0, 20))); // Espacio fijo entre el JTextPane y los botones
-        main.add(buttonPanel);
-        main.add(Box.createVerticalGlue()); // Espacio flexible después de los botones
+        main.add(buttonPanel, BorderLayout.NORTH); // Los botones van arriba
 
-        // Añadir acciones a los botones
-        clientesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(clientesButton);
-                jFrame.dispose();
-                ClientesGUI.main(null);
-            }
-        });
+        // Acciones de los botones
+        clientesButton.addActionListener(e -> switchTo(ClientesGUI.class));
+        inventarioButton.addActionListener(e -> switchTo(InventarioGUI.class));
+        proveedoresButton.addActionListener(e -> switchTo(ProveedoresGUI.class));
+        empleadosButton.addActionListener(e -> switchTo(EmpleadosGUI.class));
+        ordenesCompraButton.addActionListener(e -> switchTo(OrdenesCompraGUI.class));
 
-        inventarioButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(inventarioButton);
-                jFrame.dispose();
-                InventarioGUI.main(null);
-            }
-        });
-
-        proveedoresButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(proveedoresButton);
-                jFrame.dispose();
-                ProveedoresGUI.main(null);
-            }
-        });
-
-        empleadosButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(empleadosButton);
-                jFrame.dispose();
-                EmpleadosGUI.main(null);
-            }
-        });
-
-        ordenesCompraButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(ordenesCompraButton);
-                jFrame.dispose();
-                OrdenesCompraGUI.main(null);
-            }
-        });
-
-        // Configurar el JFrame
+        // Frame principal
         JFrame frame = new JFrame("Menú Principal");
         frame.setContentPane(main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setVisible(true);
         frame.setResizable(false);
     }
 
-    private void customizeButton(JButton button, Color backgroundColor) {
-        button.setBackground(backgroundColor);
-        button.setForeground(Color.WHITE);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2)); // Borde negro
+    private void customizeButton(JButton button, Color backgroundColor, Font font, Dimension size) {
+        button.setFont(font);
+        button.setPreferredSize(size);
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(false); // Quita el fondo blanco
+        button.setOpaque(false);            // Hace el fondo transparente
+        button.setForeground(Color.WHITE);  // Texto blanco
+        button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2)); // Borde blanco
+
+        // Efecto hover
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent evt) {
+                button.setForeground(new Color(255, 255, 255)); // Celeste claro
+                button.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 2));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent evt) {
+                button.setForeground(Color.WHITE);
+                button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+            }
+        });
+    }
+
+    private void switchTo(Class<?> targetClass) {
+        JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(main);
+        jFrame.dispose();
+        try {
+            targetClass.getMethod("main", String[].class).invoke(null, (Object) null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
-        new MenuPrincipal(); // Crear una instancia de MenuPrincipal
+        new MenuPrincipal();
     }
 }

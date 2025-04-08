@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class ConexionBD {
-    public Connection getconnection(){
+    public static Connection getconnection(){
         Connection con = null;
         try{
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ferreteria","root","");

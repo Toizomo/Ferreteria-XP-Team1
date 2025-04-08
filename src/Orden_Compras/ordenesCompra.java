@@ -9,6 +9,7 @@ public class ordenesCompra {
     String estado_orden;
     String fecha_compra;
 
+    // Constructor con ID (para actualizar)
     public ordenesCompra(int id_orden_compra, int id_cliente, int id_empleado, int id_producto, int total, String estado_orden, String fecha_compra) {
         this.id_orden_compra = id_orden_compra;
         this.id_cliente = id_cliente;
@@ -16,6 +17,16 @@ public class ordenesCompra {
         this.id_producto = id_producto;
         this.total = total;
         this.estado_orden = estado_orden;
+        this.fecha_compra = fecha_compra;
+    }
+
+    // Constructor sin ID (para agregar)
+    public ordenesCompra(int id_cliente, int id_empleado, int id_producto, int total, double estado_orden, String fecha_compra) {
+        this.id_cliente = id_cliente;
+        this.id_empleado = id_empleado;
+        this.id_producto = id_producto;
+        this.total = total;
+        this.estado_orden = String.valueOf(estado_orden);
         this.fecha_compra = fecha_compra;
     }
 
