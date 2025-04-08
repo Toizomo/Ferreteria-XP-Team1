@@ -44,6 +44,7 @@ public class ClientesGUI {
                 Clientes Clientes = new Clientes(0, nombre, telefono, direccion, correo);
                 ClientesDAO.agregar(Clientes);
                 mostrar();
+                clear();
 
             }
         });
@@ -60,7 +61,7 @@ public class ClientesGUI {
                 Clientes Clientes = new Clientes(id_clientes, nombre, telefono, direccion, correo);
                 ClientesDAO.actualizar(Clientes);
                 mostrar();
-
+                clear();
             }
         });
 
@@ -72,6 +73,7 @@ public class ClientesGUI {
                 int id_clientes = Integer.parseInt(textField1.getText());
                 ClientesDAO.eliminar(id_clientes);
                 mostrar();
+                clear();
             }
         });
 
@@ -104,6 +106,14 @@ public class ClientesGUI {
         });
 
 
+    }
+
+    private void clear() {
+        textField1.setText("");
+        textField2.setText("");
+        textField3.setText("");
+        textField4.setText("");
+        textField5.setText("");
     }
 
     public void mostrar()

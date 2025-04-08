@@ -3,7 +3,7 @@ package MenuPrincipal;
 import Clientes.ClientesGUI;
 import Empleados.EmpleadosGUI;
 import Inventario.InventarioGUI;
-import Orden_Compras.OrdenesCompra.OrdenesCompraGUI;
+import Orden_Compras.OrdenesCompraGUI;
 import Proveedores.ProveedoresGUI;
 import javax.swing.*;
 import java.awt.*;
