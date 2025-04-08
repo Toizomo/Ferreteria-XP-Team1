@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-04-2025 a las 19:42:13
+-- Tiempo de generación: 08-04-2025 a las 01:58:35
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -68,7 +68,8 @@ CREATE TABLE `empleados` (
 
 INSERT INTO `empleados` (`id_empleado`, `nombre`, `cargo`, `salario`) VALUES
 (1, 'Alojo', 'Empleado', 350000.00),
-(4, 'Jhoan', 'Empleado', 200000.00);
+(4, 'Jhoan', 'Empleado', 200000.00),
+(5, 'Jhon mi novio', 'ADMINISTRADOR', 120000.00);
 
 -- --------------------------------------------------------
 
@@ -84,6 +85,14 @@ CREATE TABLE `inventario_productos` (
   `precio_producto` int(11) NOT NULL,
   `id_proveedor_asociado` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `inventario_productos`
+--
+
+INSERT INTO `inventario_productos` (`id_producto`, `nombre_producto`, `categoria`, `cantidad_stock`, `precio_producto`, `id_proveedor_asociado`) VALUES
+(1, 'Jack', 'Electricos', 20, 1232213, NULL),
+(2, 'prepucioi', 'Herramientas', 20, 1321345, NULL);
 
 -- --------------------------------------------------------
 
@@ -109,18 +118,17 @@ CREATE TABLE `ordenes_compra` (
 CREATE TABLE `proveedores` (
   `id_proveedor` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
-  `contacto` varchar(50) NOT NULL,
-  `categoria_producto` varchar(50) NOT NULL
+  `telefono` varchar(50) NOT NULL,
+  `categoria_producto` enum('Herramientas','Electricos','Construccion','Plomeria','Materiales') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `proveedores`
 --
 
-INSERT INTO `proveedores` (`id_proveedor`, `nombre`, `contacto`, `categoria_producto`) VALUES
-(1, 'asd', '12345', 'herramientas'),
-(4, 'Karol Arbelaez', '31123441', 'Clavos'),
-(5, 'Quico', '5671222132', 'Maquinaria');
+INSERT INTO `proveedores` (`id_proveedor`, `nombre`, `telefono`, `categoria_producto`) VALUES
+(7, 'castillo', '5556', 'Herramientas'),
+(9, 'pedro', '45666', 'Electricos');
 
 -- --------------------------------------------------------
 
@@ -193,13 +201,13 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  MODIFY `id_empleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_empleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario_productos`
 --
 ALTER TABLE `inventario_productos`
-  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `ordenes_compra`
@@ -211,7 +219,7 @@ ALTER TABLE `ordenes_compra`
 -- AUTO_INCREMENT de la tabla `proveedores`
 --
 ALTER TABLE `proveedores`
-  MODIFY `id_proveedor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_proveedor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `registro_ventas`

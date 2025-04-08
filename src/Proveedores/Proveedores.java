@@ -4,14 +4,14 @@ public class Proveedores {
 
     private int id_proveedor;
     private String nombre;
-    private String contacto;
-    private String productos_suministrados;
+    private String telefono;
+    private String categoria_producto;
 
-    public Proveedores(int id_proveedor, String nombre, String contacto, String productos_suministrados) {
+    public Proveedores(int id_proveedor, String nombre, String telefono, String categoria_producto) {
         this.id_proveedor = id_proveedor;
         this.nombre = nombre;
-        this.contacto = contacto;
-        this.productos_suministrados = productos_suministrados;
+        this.telefono = telefono;
+        this.categoria_producto = categoria_producto;
     }
 
     public int getId_proveedor() {
@@ -30,19 +30,19 @@ public class Proveedores {
         this.nombre = nombre;
     }
 
-    public String getContacto() {
-        return contacto;
+    public String getTelefono() {
+        return telefono;
     }
 
-    public void setContacto(String contacto) {
-        this.contacto = contacto;
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
-    public String getProductos_suministrados() {
-        return productos_suministrados;
+    public String getCategoria_producto() {
+        return categoria_producto;
     }
 
-    public void setProductos_suministrados(String productos_suministrados) {
-        this.productos_suministrados = productos_suministrados;
+    public void setCategoria_producto(String categoria_producto) {
+        this.categoria_producto = categoria_producto;
     }
 }

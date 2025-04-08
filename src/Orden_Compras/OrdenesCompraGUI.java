@@ -1,4 +1,4 @@
-package Orden_Compras.OrdenesCompra;
+package Orden_Compras;
 
 import MenuPrincipal.MenuPrincipal;
 import Orden_Compras.OrdenesCompraDAO;
