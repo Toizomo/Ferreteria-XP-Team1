@@ -5,45 +5,59 @@ import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.awt.event.*;
+import java.sql.*;
 
 public class InventarioGUI {
-
     private JPanel main;
-
     private JTable table1;
-
     private JTextField id;
-
     private JTextField nombre;
-
     private JTextField categoria;
-
     private JTextField precio;
-
     private JTextField cantidad_stock;
-
-    private JTextField id_proveedor;
-
+    private JComboBox<Integer> id_proveedor;
     private JButton agregarButton;
-
     private JButton actualizarButton;
-
     private JButton eliminarButton;
     private JButton volverButton;
 
     InventarioDAO inventarioDAO = new InventarioDAO();
+    ConexionBD conexionBD = new ConexionBD();
 
     public InventarioGUI() {
         obtener_datos();
+        cargarIdsProveedores();
         id.setEnabled(false);
+        categoria.setEnabled(false); // No editable
+
+        // Evento al seleccionar proveedor
+        id_proveedor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Integer selectedId = (Integer) id_proveedor.getSelectedItem();
+                if (selectedId != null) {
+                    try (Connection con = conexionBD.getconnection()) {
+                        String sql = "SELECT categoria_producto FROM proveedores WHERE id_proveedor = ?";
+                        PreparedStatement ps = con.prepareStatement(sql);
+                        ps.setInt(1, selectedId);
+                        ResultSet rs = ps.executeQuery();
+
+                        if (rs.next()) {
+                            String nombreCategoria = rs.getString("categoria_producto");
+                            categoria.setText(nombreCategoria);
+                        } else {
+                            categoria.setText("");
+                        }
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error al obtener la categoría del proveedor.");
+                    }
+                }
+            }
+        });
+
 
         agregarButton.addActionListener(new ActionListener() {
             @Override
@@ -52,7 +66,7 @@ public class InventarioGUI {
                 String categoriaProducto = categoria.getText();
                 int precioProducto = Integer.parseInt(precio.getText());
                 int cantidadStock = Integer.parseInt(cantidad_stock.getText());
-                Integer idProveedor = id_proveedor.getText().isEmpty() ? null : Integer.parseInt(id_proveedor.getText());
+                Integer idProveedor = (Integer) id_proveedor.getSelectedItem();
 
                 Inventario inventario = new Inventario(0, nombreProducto, categoriaProducto, cantidadStock, precioProducto, idProveedor);
                 inventarioDAO.agregar(inventario);
@@ -69,7 +83,7 @@ public class InventarioGUI {
                 int precioProducto = Integer.parseInt(precio.getText());
                 int cantidadStock = Integer.parseInt(cantidad_stock.getText());
                 int idProducto = Integer.parseInt(id.getText());
-                Integer idProveedor = id_proveedor.getText().isEmpty() ? null : Integer.parseInt(id_proveedor.getText());
+                Integer idProveedor = (Integer) id_proveedor.getSelectedItem();
 
                 Inventario inventario = new Inventario(idProducto, nombreProducto, categoriaProducto, cantidadStock, precioProducto, idProveedor);
                 inventarioDAO.actualizar(inventario);
@@ -91,9 +105,7 @@ public class InventarioGUI {
         table1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
                 int selectFila = table1.getSelectedRow();
-
                 if (selectFila >= 0) {
                     id.setText(table1.getValueAt(selectFila, 0).toString());
                     nombre.setText(table1.getValueAt(selectFila, 1).toString());
@@ -101,9 +113,8 @@ public class InventarioGUI {
                     cantidad_stock.setText(table1.getValueAt(selectFila, 3).toString());
                     precio.setText(table1.getValueAt(selectFila, 4).toString());
 
-                    // Handle potential null value for provider ID
                     Object proveedorValue = table1.getValueAt(selectFila, 5);
-                    id_proveedor.setText(proveedorValue == null ? "" : proveedorValue.toString());
+                    id_proveedor.setSelectedItem(proveedorValue);
                 }
             }
         });
@@ -118,20 +129,34 @@ public class InventarioGUI {
         });
     }
 
+    public void cargarIdsProveedores() {
+        try (Connection con = conexionBD.getconnection()) {
+            String sql = "SELECT id_proveedor FROM proveedores";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            id_proveedor.removeAllItems();
+            while (rs.next()) {
+                int id = rs.getInt("id_proveedor");
+                id_proveedor.addItem(id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al cargar proveedores.");
+        }
+    }
+
     public void clear() {
         id.setText("");
         nombre.setText("");
         categoria.setText("");
         precio.setText("");
         cantidad_stock.setText("");
-        id_proveedor.setText("");
+        id_proveedor.setSelectedIndex(-1);
     }
-
-    ConexionBD conexionBD = new ConexionBD();
 
     public void obtener_datos() {
         DefaultTableModel model = new DefaultTableModel();
-
         model.addColumn("id_producto");
         model.addColumn("nombre_producto");
         model.addColumn("categoria");
@@ -163,12 +188,11 @@ public class InventarioGUI {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Gestión de Inventario");
+        JFrame frame = new JFrame("Inventario");
         frame.setContentPane(new InventarioGUI().main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+        frame.setSize(800, 700);
         frame.setVisible(true);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setResizable(false);
     }
 }

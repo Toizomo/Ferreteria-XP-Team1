@@ -1,17 +1,11 @@
 package Inventario;
 
 public class Inventario {
-
     private int id_producto;
-
     private String nombre_producto;
-
     private String categoria;
-
     private int cantidad_stock;
-
     private int precio_producto;
-
     private Integer id_proveedor_asociado;
 
     public Inventario(int id_producto, String nombre_producto, String categoria,

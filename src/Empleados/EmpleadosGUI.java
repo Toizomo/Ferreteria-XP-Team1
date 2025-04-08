@@ -101,6 +101,13 @@ public class EmpleadosGUI {
 
     }
 
+    public void clear() {
+        textField1.setText("");
+        textField2.setText("");
+        comboBox1.setSelectedIndex(0);
+        textField3.setText("");
+    }
+
     public void mostrar()
     {
         DefaultTableModel model = new DefaultTableModel();
