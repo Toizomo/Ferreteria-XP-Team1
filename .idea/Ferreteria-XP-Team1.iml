@@ -8,5 +8,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="mysql.connector.java" level="project" />
+    <orderEntry type="library" name="itextpdf-5.5.13.3" level="project" />
+    <orderEntry type="library" name="flatlaf-intellij-themes-3.5.4" level="project" />
+    <orderEntry type="library" name="flatlaf-3.5.4" level="project" />
+    <orderEntry type="library" name="jakarta.mail-2.0.1" level="project" />
   </component>
 </module>

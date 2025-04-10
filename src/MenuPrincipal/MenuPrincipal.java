@@ -1,5 +1,6 @@
 package MenuPrincipal;
 
+import Chat.ChatServidorGUI;
 import Clientes.ClientesGUI;
 import Empleados.EmpleadosGUI;
 import Img.img;
@@ -19,6 +20,7 @@ public class MenuPrincipal {
     private JButton proveedoresButton;
     private JButton empleadosButton;
     private JButton ordenesCompraButton;
+    private JButton chatAdministradorButton;
     private JLabel ferreteriaLabel;
 
     public MenuPrincipal() {
@@ -35,6 +37,7 @@ public class MenuPrincipal {
         proveedoresButton = new JButton("Proveedores");
         empleadosButton = new JButton("Empleados");
         ordenesCompraButton = new JButton("Órdenes de Compra");
+        chatAdministradorButton = new JButton("Chat Administrador");
 
         // Estilos
         Dimension buttonSize = new Dimension(180, 50);
@@ -47,6 +50,7 @@ public class MenuPrincipal {
         customizeButton(proveedoresButton, buttonColor, buttonFont, buttonSize);
         customizeButton(empleadosButton, buttonColor, buttonFont, buttonSize);
         customizeButton(ordenesCompraButton, buttonColor, buttonFont, buttonSize);
+        customizeButton(chatAdministradorButton, buttonColor, buttonFont, buttonSize);
 
         // Añadir botones al panel
         buttonPanel.add(clientesButton);
@@ -54,6 +58,7 @@ public class MenuPrincipal {
         buttonPanel.add(proveedoresButton);
         buttonPanel.add(empleadosButton);
         buttonPanel.add(ordenesCompraButton);
+        buttonPanel.add(chatAdministradorButton);
 
         main.add(buttonPanel, BorderLayout.NORTH); // Los botones van arriba
 
@@ -63,6 +68,7 @@ public class MenuPrincipal {
         proveedoresButton.addActionListener(e -> switchTo(ProveedoresGUI.class));
         empleadosButton.addActionListener(e -> switchTo(EmpleadosGUI.class));
         ordenesCompraButton.addActionListener(e -> switchTo(OrdenesCompraGUI.class));
+        chatAdministradorButton.addActionListener( e-> switchTo(ChatServidorGUI.class));
 
         // Frame principal
         JFrame frame = new JFrame("Menú Principal");
