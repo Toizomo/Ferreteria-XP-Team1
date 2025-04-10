@@ -5,6 +5,7 @@ import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
@@ -30,6 +31,9 @@ public class InventarioGUI {
         cargarIdsProveedores();
         id.setEnabled(false);
         categoria.setEnabled(false); // No editable
+
+        // Aplicar los estilos
+        aplicarEstilos();
 
         // Evento al seleccionar proveedor
         id_proveedor.addActionListener(new ActionListener() {
@@ -57,7 +61,6 @@ public class InventarioGUI {
                 }
             }
         });
-
 
         agregarButton.addActionListener(new ActionListener() {
             @Override
@@ -185,6 +188,48 @@ public class InventarioGUI {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void aplicarEstilos() {
+        Font fuenteCampos = new Font("Serif", Font.PLAIN, 15);
+        Font fuenteBotones = new Font("Serif", Font.BOLD, 15);
+        Color colorFondo = new Color(216, 196, 164); // beige claro
+        Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
+        Color colorBotonFondo = colorFondo;
+        Color colorBotonTexto = Color.WHITE;
+        Color colorBordeBoton = Color.WHITE;
+
+        main.setBackground(colorFondo);
+
+        JTextField[] campos = { id, nombre, categoria, precio, cantidad_stock };
+        for (JTextField campo : campos) {
+            campo.setFont(fuenteCampos);
+            campo.setBackground(Color.WHITE);
+            campo.setForeground(colorTexto);
+            campo.setBorder(BorderFactory.createLineBorder(colorTexto));
+        }
+
+        id_proveedor.setFont(fuenteCampos);
+        id_proveedor.setBackground(Color.WHITE);
+        id_proveedor.setForeground(colorTexto);
+        id_proveedor.setBorder(BorderFactory.createLineBorder(colorTexto));
+
+        JButton[] botones = { agregarButton, actualizarButton, eliminarButton, volverButton };
+        for (JButton boton : botones) {
+            boton.setFont(fuenteBotones);
+            boton.setBackground(colorBotonFondo);
+            boton.setForeground(colorBotonTexto);
+            boton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+            boton.setFocusPainted(false);
+        }
+
+        table1.setFont(new Font("Serif", Font.PLAIN, 14));
+        table1.setForeground(colorTexto);
+        table1.setBackground(Color.WHITE);
+        table1.setRowHeight(25);
+        table1.getTableHeader().setFont(new Font("Serif", Font.BOLD, 15));
+        table1.getTableHeader().setBackground(colorFondo);
+        table1.getTableHeader().setForeground(colorTexto);
     }
 
     public static void main(String[] args) {

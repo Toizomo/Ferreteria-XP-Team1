@@ -5,6 +5,7 @@ import Orden_Compras.OrdenesCompraDAO;
 import Orden_Compras.ordenesCompra;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -23,6 +24,9 @@ public class OrdenesCompraGUI {
 
     public OrdenesCompraGUI() {
 
+        // Aplicar estilos
+        aplicarEstilos();
+
         agregarCompraButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -34,7 +38,7 @@ public class OrdenesCompraGUI {
                     String fecha = fechaCompra.getText();
 
                     ordenesCompra orden = new ordenesCompra(0, cliente, empleado, producto, totalCompra, fecha);
-                    OrdenesCompraDAO .agregar(orden);
+                    OrdenesCompraDAO.agregar(orden);
 
                     JOptionPane.showMessageDialog(null, "Compra agregada correctamente.");
                 } catch (Exception ex) {
@@ -55,7 +59,7 @@ public class OrdenesCompraGUI {
                     String fecha = fechaCompra.getText();
 
                     ordenesCompra orden = new ordenesCompra(0, cliente, empleado, producto, totalCompra, fecha);
-                    OrdenesCompraDAO .actualizar(orden);
+                    OrdenesCompraDAO.actualizar(orden);
 
                     JOptionPane.showMessageDialog(null, "Compra actualizada correctamente.");
                 } catch (Exception ex) {
@@ -82,5 +86,47 @@ public class OrdenesCompraGUI {
         frame.setVisible(true);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setResizable(false);
+    }
+
+    private void aplicarEstilos() {
+        Font fuenteCampos = new Font("Serif", Font.PLAIN, 15);
+        Font fuenteBotones = new Font("Serif", Font.BOLD, 15);
+        Color colorFondo = new Color(216, 196, 164); // beige claro
+        Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
+        Color colorBotonFondo = colorFondo;
+        Color colorBotonTexto = Color.WHITE;
+        Color colorBordeBoton = Color.WHITE;
+
+        main.setBackground(colorFondo);
+
+        // Estilos para campos de texto
+        JTextField[] campos = { idOrdenCompra, idCliente, idEmpleado, idProducto, total, fechaCompra };
+        for (JTextField campo : campos) {
+            campo.setFont(fuenteCampos);
+            campo.setBackground(Color.WHITE);
+            campo.setForeground(colorTexto);
+            campo.setBorder(BorderFactory.createLineBorder(colorTexto));
+        }
+
+        // Estilos para botones
+        JButton[] botones = { agregarCompraButton, actualizarCompraButton, volverButton };
+        for (JButton boton : botones) {
+            boton.setFont(fuenteBotones);
+            boton.setBackground(colorBotonFondo);
+            boton.setForeground(colorBotonTexto);
+            boton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+            boton.setFocusPainted(false);
+        }
+
+        // Estilos para la tabla (si se agrega)
+        if (table1 != null) {
+            table1.setFont(new Font("Serif", Font.PLAIN, 14));
+            table1.setForeground(colorTexto);
+            table1.setBackground(Color.WHITE);
+            table1.setRowHeight(25);
+            table1.getTableHeader().setFont(new Font("Serif", Font.BOLD, 15));
+            table1.getTableHeader().setBackground(colorFondo);
+            table1.getTableHeader().setForeground(colorTexto);
+        }
     }
 }

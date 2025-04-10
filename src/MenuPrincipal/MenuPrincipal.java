@@ -1,11 +1,13 @@
 package MenuPrincipal;
 
+import Chat.ChatServidorGUI;
 import Clientes.ClientesGUI;
 import Empleados.EmpleadosGUI;
 import Img.img;
 import Inventario.InventarioGUI;
 import Orden_Compras.OrdenesCompraGUI;
 import Proveedores.ProveedoresGUI;
+import Reportes.ReportesGUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +21,8 @@ public class MenuPrincipal {
     private JButton proveedoresButton;
     private JButton empleadosButton;
     private JButton ordenesCompraButton;
+    private JButton chatAdministradorButton;
+    private JButton reportesButton;
     private JLabel ferreteriaLabel;
 
     public MenuPrincipal() {
@@ -35,6 +39,8 @@ public class MenuPrincipal {
         proveedoresButton = new JButton("Proveedores");
         empleadosButton = new JButton("Empleados");
         ordenesCompraButton = new JButton("Órdenes de Compra");
+        chatAdministradorButton = new JButton("Chat Administrador");
+        reportesButton = new JButton("Reportes");
 
         // Estilos
         Dimension buttonSize = new Dimension(180, 50);
@@ -47,6 +53,8 @@ public class MenuPrincipal {
         customizeButton(proveedoresButton, buttonColor, buttonFont, buttonSize);
         customizeButton(empleadosButton, buttonColor, buttonFont, buttonSize);
         customizeButton(ordenesCompraButton, buttonColor, buttonFont, buttonSize);
+        customizeButton(chatAdministradorButton, buttonColor, buttonFont, buttonSize);
+        customizeButton(reportesButton, buttonColor, buttonFont, buttonSize);
 
         // Añadir botones al panel
         buttonPanel.add(clientesButton);
@@ -54,6 +62,8 @@ public class MenuPrincipal {
         buttonPanel.add(proveedoresButton);
         buttonPanel.add(empleadosButton);
         buttonPanel.add(ordenesCompraButton);
+        buttonPanel.add(chatAdministradorButton);
+        buttonPanel.add(reportesButton);
 
         main.add(buttonPanel, BorderLayout.NORTH); // Los botones van arriba
 
@@ -63,6 +73,8 @@ public class MenuPrincipal {
         proveedoresButton.addActionListener(e -> switchTo(ProveedoresGUI.class));
         empleadosButton.addActionListener(e -> switchTo(EmpleadosGUI.class));
         ordenesCompraButton.addActionListener(e -> switchTo(OrdenesCompraGUI.class));
+        chatAdministradorButton.addActionListener( e-> switchTo(ChatServidorGUI.class));
+        reportesButton.addActionListener(e -> switchTo(ReportesGUI.class));;
 
         // Frame principal
         JFrame frame = new JFrame("Menú Principal");

@@ -1,6 +1,7 @@
 package Chat;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.Socket;
@@ -18,6 +19,9 @@ public class ChatClienteGUI {
     private BufferedReader in;
 
     public ChatClienteGUI() {
+        // Aplicar estilos
+        aplicarEstilos();
+
         textArea1.setEditable(false);
 
         conectarButton.addActionListener(e -> {
@@ -95,13 +99,54 @@ public class ChatClienteGUI {
         SwingUtilities.invokeLater(() -> textArea1.append(mensaje));
     }
 
+    public JPanel getMainPanel() {
+        return main;
+    }
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Cliente de Chat");
         ChatClienteGUI chatClienteGUI = new ChatClienteGUI();
-        frame.setContentPane(chatClienteGUI.main);
+        frame.setContentPane(chatClienteGUI.getMainPanel());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setSize(600, 400);
         frame.setVisible(true);
+    }
+
+    private void aplicarEstilos() {
+        Font fuenteCampos = new Font("Serif", Font.PLAIN, 15);
+        Font fuenteBotones = new Font("Serif", Font.BOLD, 15);
+        Color colorFondo = new Color(216, 196, 164); // beige claro
+        Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
+        Color colorBotonFondo = colorFondo;
+        Color colorBotonTexto = Color.WHITE;
+        Color colorBordeBoton = Color.WHITE;
+
+        main.setBackground(colorFondo);
+
+        // Estilos para el área de texto (JTextArea)
+        textArea1.setFont(fuenteCampos);
+        textArea1.setForeground(colorTexto);
+        textArea1.setBackground(Color.WHITE);
+        textArea1.setBorder(BorderFactory.createLineBorder(colorTexto));
+
+        // Estilos para el campo de texto de entrada
+        textField1.setFont(fuenteCampos);
+        textField1.setBackground(Color.WHITE);
+        textField1.setForeground(colorTexto);
+        textField1.setBorder(BorderFactory.createLineBorder(colorTexto));
+
+        // Estilos para los botones
+        conectarButton.setFont(fuenteBotones);
+        conectarButton.setBackground(colorBotonFondo);
+        conectarButton.setForeground(colorBotonTexto);
+        conectarButton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+        conectarButton.setFocusPainted(false);
+
+        enviarButton.setFont(fuenteBotones);
+        enviarButton.setBackground(colorBotonFondo);
+        enviarButton.setForeground(colorBotonTexto);
+        enviarButton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+        enviarButton.setFocusPainted(false);
     }
 }

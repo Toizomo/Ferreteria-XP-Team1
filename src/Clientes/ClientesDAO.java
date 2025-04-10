@@ -3,10 +3,7 @@ package Clientes;
 import Conexion.ConexionBD;
 
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ClientesDAO {
 
@@ -76,6 +73,19 @@ public class ClientesDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public ResultSet obtenerClientes() {
+        Connection con = ConexionBD.getconnection();
+        String query = "SELECT * FROM clientes";
+
+        try {
+            Statement stat = con.createStatement();
+            return stat.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

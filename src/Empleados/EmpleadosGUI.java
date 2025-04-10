@@ -5,14 +5,9 @@ import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
 import java.util.Objects;
 
 public class EmpleadosGUI {
@@ -26,12 +21,16 @@ public class EmpleadosGUI {
     private JButton actualizarButton;
     private JButton eliminarButton;
     private JButton volverButton;
+
     EmpleadosDAO EmpleadosDAO = new EmpleadosDAO();
     ConexionBD ConexionBD = new ConexionBD();
     int filas = 0;
 
     public EmpleadosGUI() {
         mostrar();
+
+        // Aplicar estilos
+        aplicarEstilos();
 
         agregarButton.addActionListener(new ActionListener() {
             @Override
@@ -55,7 +54,6 @@ public class EmpleadosGUI {
                 Empleados Empleados = new Empleados(id_empleado, nombre, cargo, salario);
                 EmpleadosDAO.actualizarEmpleado(Empleados);
                 mostrar();
-
             }
         });
 
@@ -68,18 +66,13 @@ public class EmpleadosGUI {
             }
         });
 
-
-
-        table1.addMouseListener(new MouseAdapter()
-        {
+        table1.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e)
-            {
+            public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 int selectFila = table1.getSelectedRow();
 
-                if (selectFila >= 0)
-                {
+                if (selectFila >= 0) {
                     textField1.setText(String.valueOf(table1.getValueAt(selectFila, 0))); // ID Empleado
                     textField2.setText((String) table1.getValueAt(selectFila, 1)); // Nombre
                     comboBox1.setSelectedItem((String) table1.getValueAt(selectFila, 2)); // Cargo
@@ -108,8 +101,7 @@ public class EmpleadosGUI {
         textField3.setText("");
     }
 
-    public void mostrar()
-    {
+    public void mostrar() {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Empleado");
         model.addColumn("Nombre");
@@ -125,8 +117,7 @@ public class EmpleadosGUI {
             String query = "SELECT * FROM empleados";
             ResultSet fb = stat.executeQuery(query);
 
-            while (fb.next())
-            {
+            while (fb.next()) {
                 dato[0] = fb.getString(1);
                 dato[1] = fb.getString(2);
                 dato[2] = fb.getString(3);
@@ -134,21 +125,60 @@ public class EmpleadosGUI {
 
                 model.addRow(dato);
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args)
-    {
+    private void aplicarEstilos() {
+        Font fuenteCampos = new Font("Serif", Font.PLAIN, 15);
+        Font fuenteBotones = new Font("Serif", Font.BOLD, 15);
+        Color colorFondo = new Color(216, 196, 164); // beige claro
+        Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
+        Color colorBotonFondo = colorFondo;
+        Color colorBotonTexto = Color.WHITE;
+        Color colorBordeBoton = Color.WHITE;
+
+        main.setBackground(colorFondo);
+
+        JTextField[] campos = { textField1, textField2, textField3 };
+        for (JTextField campo : campos) {
+            campo.setFont(fuenteCampos);
+            campo.setBackground(Color.WHITE);
+            campo.setForeground(colorTexto);
+            campo.setBorder(BorderFactory.createLineBorder(colorTexto));
+        }
+
+        comboBox1.setFont(fuenteCampos);
+        comboBox1.setBackground(Color.WHITE);
+        comboBox1.setForeground(colorTexto);
+        comboBox1.setBorder(BorderFactory.createLineBorder(colorTexto));
+
+        JButton[] botones = { agregarButton, actualizarButton, eliminarButton, volverButton };
+        for (JButton boton : botones) {
+            boton.setFont(fuenteBotones);
+            boton.setBackground(colorBotonFondo);
+            boton.setForeground(colorBotonTexto);
+            boton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+            boton.setFocusPainted(false);
+        }
+
+        table1.setFont(new Font("Serif", Font.PLAIN, 14));
+        table1.setForeground(colorTexto);
+        table1.setBackground(Color.WHITE);
+        table1.setRowHeight(25);
+        table1.getTableHeader().setFont(new Font("Serif", Font.BOLD, 15));
+        table1.getTableHeader().setBackground(colorFondo);
+        table1.getTableHeader().setForeground(colorTexto);
+    }
+
+    public static void main(String[] args) {
         JFrame frame = new JFrame("Empleados");
         frame.setContentPane(new EmpleadosGUI().main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-        frame.setSize(880,700);
+        frame.setSize(880, 700);
         frame.setResizable(false);
     }
 }
