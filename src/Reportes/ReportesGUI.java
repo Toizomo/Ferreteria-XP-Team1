@@ -24,7 +24,7 @@ public class ReportesGUI extends JPanel {
 
     public ReportesGUI() {
         add(main);
-        aplicarEstilos();
+        aplicarEstilos(); // Llamada al método para aplicar estilos
 
         if (comboBox1.getItemCount() == 0) {
             comboBox1.addItem("Diario");
@@ -74,22 +74,25 @@ public class ReportesGUI extends JPanel {
     }
 
     private void aplicarEstilos() {
-        Font fuente = new Font("Arial", Font.PLAIN, 14);
+        Font fuenteCampos = new Font("Serif", Font.PLAIN, 15);
+        Font fuenteBotones = new Font("Serif", Font.BOLD, 15);
+        Color colorFondo = new Color(216, 196, 164); // beige claro
+        Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
+        Color colorBotonFondo = colorFondo;
+        Color colorBotonTexto = Color.WHITE;
+        Color colorBordeBoton = Color.WHITE;
         Color fondoTabla = new Color(245, 245, 245);
         Color fondoAlternativo = new Color(230, 230, 230);
         Color colorHeader = new Color(60, 63, 65);
         Color textoHeader = Color.WHITE;
 
-        table1.setFont(fuente);
-        table2.setFont(fuente);
-        table3.setFont(fuente);
+        main.setBackground(colorFondo);
 
-        table1.setRowHeight(25);
-        table2.setRowHeight(25);
-        table3.setRowHeight(25);
-
+        // Estilos para las tablas
         JTable[] tablas = {table1, table2, table3};
         for (JTable tabla : tablas) {
+            tabla.setFont(fuenteCampos);
+            tabla.setRowHeight(25);
             tabla.setFillsViewportHeight(true);
 
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -113,11 +116,19 @@ public class ReportesGUI extends JPanel {
             JTableHeader header = tabla.getTableHeader();
             header.setBackground(colorHeader);
             header.setForeground(textoHeader);
-            header.setFont(new Font("Arial", Font.BOLD, 14));
+            header.setFont(new Font("Serif", Font.BOLD, 15));
         }
 
-        comboBox1.setFont(fuente);
-        comboBox2.setFont(fuente);
+        // Estilos para los combo boxes
+        comboBox1.setFont(fuenteCampos);
+        comboBox2.setFont(fuenteCampos);
+
+        // Estilos para el botón volver
+        volverButton.setFont(fuenteBotones);
+        volverButton.setBackground(colorBotonFondo);
+        volverButton.setForeground(colorBotonTexto);
+        volverButton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+        volverButton.setFocusPainted(false);
     }
 
     public void cargarDatosFiltrados(String filtro) {

@@ -8,6 +8,7 @@ import Inventario.InventarioGUI;
 import Orden_Compras.OrdenesCompraGUI;
 import Proveedores.ProveedoresGUI;
 import Reportes.ReportesGUI;
+import VentasGUI.VentasGUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,60 +24,56 @@ public class MenuPrincipal {
     private JButton ordenesCompraButton;
     private JButton chatAdministradorButton;
     private JButton reportesButton;
-    private JLabel ferreteriaLabel;
+    private JButton ventasButton;
 
     public MenuPrincipal() {
-        main = new img(); // clase img que tiene el fondo
+        main = new img();
         main.setLayout(new BorderLayout());
 
-        // Panel superior con los botones
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        buttonPanel.setOpaque(false); // Fondo transparente
+        Color botonColor = new Color(85, 60, 45);
+        Color hoverColor = new Color(255, 248, 220);
+        Color bordeColor = new Color(170, 130, 100);
+        Font fuente = new Font("Georgia", Font.BOLD, 18);
+        Dimension tamano = new Dimension(180, 50);
 
-        // Crear botones
         clientesButton = new JButton("Clientes");
         inventarioButton = new JButton("Inventario");
         proveedoresButton = new JButton("Proveedores");
         empleadosButton = new JButton("Empleados");
         ordenesCompraButton = new JButton("Órdenes de Compra");
-        chatAdministradorButton = new JButton("Chat Administrador");
+        chatAdministradorButton = new JButton("Chat Admin");
         reportesButton = new JButton("Reportes");
+        ventasButton = new JButton("Ventas");
 
-        // Estilos
-        Dimension buttonSize = new Dimension(180, 50);
-        Font buttonFont = new Font("Times New Roman", Font.BOLD, 18);
-        Color buttonColor = new Color(70, 130, 180); // Azul oscuro bonito
+        JButton[] botones = {
+                clientesButton, inventarioButton, proveedoresButton, empleadosButton,
+                ordenesCompraButton, chatAdministradorButton, reportesButton, ventasButton
+        };
 
-        // Personalizar botones
-        customizeButton(clientesButton, buttonColor, buttonFont, buttonSize);
-        customizeButton(inventarioButton, buttonColor, buttonFont, buttonSize);
-        customizeButton(proveedoresButton, buttonColor, buttonFont, buttonSize);
-        customizeButton(empleadosButton, buttonColor, buttonFont, buttonSize);
-        customizeButton(ordenesCompraButton, buttonColor, buttonFont, buttonSize);
-        customizeButton(chatAdministradorButton, buttonColor, buttonFont, buttonSize);
-        customizeButton(reportesButton, buttonColor, buttonFont, buttonSize);
+        JPanel gridPanel = new JPanel(new GridLayout(4, 2, 20, 20));
+        gridPanel.setOpaque(false);
+        gridPanel.setBorder(BorderFactory.createEmptyBorder(60, 60, 60, 60));
 
-        // Añadir botones al panel
-        buttonPanel.add(clientesButton);
-        buttonPanel.add(inventarioButton);
-        buttonPanel.add(proveedoresButton);
-        buttonPanel.add(empleadosButton);
-        buttonPanel.add(ordenesCompraButton);
-        buttonPanel.add(chatAdministradorButton);
-        buttonPanel.add(reportesButton);
+        for (JButton btn : botones) {
+            personalizarBoton(btn, botonColor, hoverColor, bordeColor, fuente, tamano);
+            gridPanel.add(btn);
+        }
 
-        main.add(buttonPanel, BorderLayout.NORTH); // Los botones van arriba
+        JPanel contenedor = new JPanel(new GridBagLayout());
+        contenedor.setOpaque(false);
+        contenedor.add(gridPanel);
 
-        // Acciones de los botones
+        main.add(contenedor, BorderLayout.CENTER);
+
         clientesButton.addActionListener(e -> switchTo(ClientesGUI.class));
         inventarioButton.addActionListener(e -> switchTo(InventarioGUI.class));
         proveedoresButton.addActionListener(e -> switchTo(ProveedoresGUI.class));
         empleadosButton.addActionListener(e -> switchTo(EmpleadosGUI.class));
         ordenesCompraButton.addActionListener(e -> switchTo(OrdenesCompraGUI.class));
-        chatAdministradorButton.addActionListener( e-> switchTo(ChatServidorGUI.class));
-        reportesButton.addActionListener(e -> switchTo(ReportesGUI.class));;
+        chatAdministradorButton.addActionListener(e -> switchTo(ChatServidorGUI.class));
+        reportesButton.addActionListener(e -> switchTo(ReportesGUI.class));
+        ventasButton.addActionListener(e -> switchTo(VentasGUI.class));
 
-        // Frame principal
         JFrame frame = new JFrame("Menú Principal");
         frame.setContentPane(main);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,27 +82,27 @@ public class MenuPrincipal {
         frame.setResizable(false);
     }
 
-    private void customizeButton(JButton button, Color backgroundColor, Font font, Dimension size) {
-        button.setFont(font);
+    private void personalizarBoton(JButton button, Color fondo, Color textoHover, Color borde, Font fuente, Dimension size) {
+        button.setFont(fuente);
         button.setPreferredSize(size);
         button.setFocusPainted(false);
-        button.setContentAreaFilled(false); // Quita el fondo blanco
-        button.setOpaque(false);            // Hace el fondo transparente
-        button.setForeground(Color.WHITE);  // Texto blanco
-        button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2)); // Borde blanco
+        button.setForeground(Color.WHITE);
+        button.setBackground(fondo);
+        button.setOpaque(true);
+        button.setBorder(BorderFactory.createLineBorder(borde, 2));
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Efecto hover
         button.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent evt) {
-                button.setForeground(new Color(255, 255, 255)); // Celeste claro
-                button.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 2));
+            public void mouseEntered(MouseEvent e) {
+                button.setForeground(textoHover);
+                button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
             }
 
             @Override
-            public void mouseExited(MouseEvent evt) {
+            public void mouseExited(MouseEvent e) {
                 button.setForeground(Color.WHITE);
-                button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+                button.setBorder(BorderFactory.createLineBorder(borde, 2));
             }
         });
     }

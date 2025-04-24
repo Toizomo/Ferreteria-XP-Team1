@@ -34,7 +34,7 @@ public class ClientesDAO {
 
     public void eliminar(int id_cliente) {
         Connection con = ConexionBD.getconnection();
-        String query = "DELETE FROM clientes WHERE id_clientes = ?";
+        String query = "DELETE FROM clientes WHERE id_cliente = ?";
 
         try {
             PreparedStatement pst = con.prepareStatement(query);
@@ -54,7 +54,7 @@ public class ClientesDAO {
 
     public void actualizar(Clientes cliente) {
         Connection con = ConexionBD.getconnection();
-        String query = "UPDATE clientes SET nombre = ?, telefono = ?, direccion = ?, correo = ? WHERE id_clientes = ?";
+        String query = "UPDATE clientes SET nombre = ?, telefono = ?, direccion = ?, correo = ? WHERE id_cliente = ?";
 
         try {
             PreparedStatement pst = con.prepareStatement(query);
