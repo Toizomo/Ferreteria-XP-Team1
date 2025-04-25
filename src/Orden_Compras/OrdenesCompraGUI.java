@@ -40,6 +40,7 @@ public class OrdenesCompraGUI {
     private JTextField filtroTextField;
     private JButton buscarButton;
     private JButton limpiarFiltrosButton;
+    private JButton volverButton;
     private static final double IVA_RATE = 0.19;
 
     private void addEmptyLine(Paragraph paragraph, int number) {
@@ -388,6 +389,15 @@ public class OrdenesCompraGUI {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     aplicarFiltro();
                 }
+            }
+        });
+
+        volverButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
+                jFrame.dispose();
+                MenuPrincipal.main(null);
             }
         });
     }

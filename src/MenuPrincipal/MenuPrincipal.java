@@ -32,7 +32,7 @@ public class MenuPrincipal {
         main.setLayout(new BorderLayout());
 
         Color botonColor = new Color(85, 60, 45);
-        Color hoverColor = new Color(255, 248, 220);
+        Color hoverColor = new Color(0, 0, 0);
         Color bordeColor = new Color(170, 130, 100);
         Font fuente = new Font("Georgia", Font.BOLD, 18);
         Dimension tamano = new Dimension(180, 50);
@@ -87,7 +87,7 @@ public class MenuPrincipal {
         button.setFont(fuente);
         button.setPreferredSize(size);
         button.setFocusPainted(false);
-        button.setForeground(Color.WHITE);
+        button.setForeground(Color.BLACK);
         button.setBackground(fondo);
         button.setOpaque(true);
         button.setBorder(BorderFactory.createLineBorder(borde, 2));
@@ -106,6 +106,8 @@ public class MenuPrincipal {
                 button.setBorder(BorderFactory.createLineBorder(borde, 2));
             }
         });
+
+
     }
 
     private void switchTo(Class<?> targetClass) {
