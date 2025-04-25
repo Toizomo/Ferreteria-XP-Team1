@@ -31,7 +31,7 @@ public class MenuPrincipal {
         main = new img();
         main.setLayout(new BorderLayout());
 
-        Color botonColor = new Color(85, 60, 45);
+        Color botonColor = new Color(179, 133, 107);
         Color hoverColor = new Color(0, 0, 0);
         Color bordeColor = new Color(170, 130, 100);
         Font fuente = new Font("Georgia", Font.BOLD, 18);
@@ -102,7 +102,7 @@ public class MenuPrincipal {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setForeground(Color.WHITE);
+                button.setForeground(Color.BLACK);
                 button.setBorder(BorderFactory.createLineBorder(borde, 2));
             }
         });
