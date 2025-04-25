@@ -1,5 +1,7 @@
 package Chat;
 
+import MenuPrincipal.MenuPrincipal;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -14,6 +16,7 @@ public class ChatServidorGUI {
     private JButton enviarButton;
     private JPanel main;
     private JButton chatCLienteButton;
+    private JButton volverButton;
 
     private PrintWriter out;
     private Socket clientSocket;
@@ -47,6 +50,16 @@ public class ChatServidorGUI {
                 frame.setVisible(true);
             });
         });
+
+        volverButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
+                jFrame.dispose();
+                MenuPrincipal.main(null);
+            }
+        });
+
     }
 
     public void iniciar() {
@@ -156,6 +169,7 @@ public class ChatServidorGUI {
         iniciarButton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
         iniciarButton.setFocusPainted(false);
 
+
         enviarButton.setFont(fuenteBotones);
         enviarButton.setBackground(colorBotonFondo);
         enviarButton.setForeground(colorBotonTexto);
@@ -167,5 +181,11 @@ public class ChatServidorGUI {
         chatCLienteButton.setForeground(colorBotonTexto);
         chatCLienteButton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
         chatCLienteButton.setFocusPainted(false);
+
+        volverButton.setFont(fuenteBotones);
+        volverButton.setBackground(colorBotonFondo);
+        volverButton.setForeground(colorBotonTexto);
+        volverButton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+        volverButton.setFocusPainted(false);
     }
 }
