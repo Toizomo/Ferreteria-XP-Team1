@@ -382,8 +382,9 @@ public class VentasGUI extends JFrame {
             volverButton.addActionListener(e -> {
                 dispose();
                 // Si tienes un menú principal para volver
-                // MainMenu mainMenu = new MainMenu();
-                // mainMenu.setVisible(true);
+                JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
+                jFrame.dispose();
+                MenuPrincipal.main(null);
             });
         }
     }

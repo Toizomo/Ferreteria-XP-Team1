@@ -1,253 +1,424 @@
 package Reportes;
 
-import Conexion.ConexionBD;
-import Inventario.Inventario;
+import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.sql.*;
-import java.util.Vector;
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ReportesDAO {
+    private Connection conexion;
+    private JTable reportesTable;
+    private DefaultTableModel tableModel;
 
-        // Agrega un producto a la tablaFactura o aumenta su cantidad si ya existe
-        public void agregarProducto(JTable tablaFactura, Inventario producto) {
-            DefaultTableModel model = (DefaultTableModel) tablaFactura.getModel();
+    public ReportesDAO(Connection conexion, JTable reportesTable, DefaultTableModel tableModel) {
+        this.conexion = conexion;
+        this.reportesTable = reportesTable;
+        this.tableModel = tableModel;
+    }
 
-            boolean encontrado = false;
-            for (int i = 0; i < model.getRowCount(); i++) {
-                int idExistente = (int) model.getValueAt(i, 0);
+    public void generarReporteVentasPorPeriodo(String periodo) {
+        tableModel.setRowCount(0);
 
-                if (idExistente == producto.getId_producto()) {
-                    int cantidadActual = (int) model.getValueAt(i, 5);
-                    model.setValueAt(cantidadActual + 1, i, 5);
+        // Configurar columnas específicas para este reporte
+        configurarColumnas(new String[]{"Fecha", "Total Ventas", "Cantidad de Órdenes"});
 
-                    int precioVenta = (int) model.getValueAt(i, 4);
-                    model.setValueAt((cantidadActual + 1) * precioVenta, i, 6);
+        try {
+            String sql = "";
 
-                    encontrado = true;
+            switch (periodo.toLowerCase()) {
+                case "diario":
+                    sql = "SELECT DATE(fecha_compra) as fecha, SUM(total) as total_ventas, COUNT(*) as num_ordenes " +
+                            "FROM ordenes_compra " +
+                            "WHERE fecha_compra >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY) " +
+                            "GROUP BY DATE(fecha_compra) " +
+                            "ORDER BY fecha DESC";
                     break;
+                case "semanal":
+                    sql = "SELECT YEARWEEK(fecha_compra, 1) as semana, " +
+                            "CONCAT('Semana ', WEEK(fecha_compra, 1), ' - ', YEAR(fecha_compra)) as periodo, " +
+                            "SUM(total) as total_ventas, COUNT(*) as num_ordenes " +
+                            "FROM ordenes_compra " +
+                            "WHERE fecha_compra >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 WEEK) " +
+                            "GROUP BY YEARWEEK(fecha_compra, 1) " +
+                            "ORDER BY semana DESC";
+                    break;
+                case "mensual":
+                    sql = "SELECT CONCAT(YEAR(fecha_compra), '-', MONTH(fecha_compra)) as mes, " +
+                            "CONCAT(MONTHNAME(fecha_compra), ' ', YEAR(fecha_compra)) as periodo, " +
+                            "SUM(total) as total_ventas, COUNT(*) as num_ordenes " +
+                            "FROM ordenes_compra " +
+                            "WHERE fecha_compra >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH) " +
+                            "GROUP BY YEAR(fecha_compra), MONTH(fecha_compra) " +
+                            "ORDER BY YEAR(fecha_compra) DESC, MONTH(fecha_compra) DESC";
+                    break;
+                default:
+                    throw new IllegalArgumentException("Periodo no válido: " + periodo);
+            }
+
+            PreparedStatement stmt = conexion.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row;
+                if (periodo.equalsIgnoreCase("diario")) {
+                    row = new Object[]{
+                            rs.getString("fecha"),
+                            String.format("$%.2f", rs.getDouble("total_ventas")),
+                            rs.getInt("num_ordenes")
+                    };
+                } else {
+                    row = new Object[]{
+                            rs.getString("periodo"),
+                            String.format("$%.2f", rs.getDouble("total_ventas")),
+                            rs.getInt("num_ordenes")
+                    };
+                }
+                tableModel.addRow(row);
+            }
+
+            rs.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al generar reporte de ventas: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void generarReporteProductosMasVendidos(int limite) {
+        tableModel.setRowCount(0);
+
+        // Configurar columnas específicas para este reporte
+        configurarColumnas(new String[]{"ID Producto", "Nombre Producto", "Categoría", "Cantidad Vendida", "Total Generado"});
+
+        try {
+            String sql = "SELECT p.id_producto, p.nombre_producto, p.categoria, " +
+                    "SUM(rv.cantidad) as cantidad_vendida, " +
+                    "SUM(rv.sub_total) as total_generado " +
+                    "FROM inventario_productos p " +
+                    "JOIN registro_ventas rv ON p.id_producto = rv.id_producto " +
+                    "GROUP BY p.id_producto, p.nombre_producto, p.categoria " +
+                    "ORDER BY cantidad_vendida DESC, total_generado DESC " +
+                    "LIMIT ?";
+
+            PreparedStatement stmt = conexion.prepareStatement(sql);
+            stmt.setInt(1, limite);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row = new Object[]{
+                        rs.getInt("id_producto"),
+                        rs.getString("nombre_producto"),
+                        rs.getString("categoria"),
+                        rs.getInt("cantidad_vendida"),
+                        String.format("$%.2f", rs.getDouble("total_generado"))
+                };
+                tableModel.addRow(row);
+            }
+
+            rs.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al generar reporte de productos más vendidos: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void generarReporteClientesConMasCompras(int limite) {
+        tableModel.setRowCount(0);
+
+        // Configurar columnas específicas para este reporte
+        configurarColumnas(new String[]{"ID Cliente", "Nombre Cliente", "Compras Realizadas", "Total Gastado", "Última Compra"});
+
+        try {
+            String sql = "SELECT c.id_cliente, c.nombre as nombre_cliente, " +
+                    "COUNT(DISTINCT o.id_orden_compra) as num_compras, " +
+                    "SUM(o.total) as total_gastado, " +
+                    "MAX(o.fecha_compra) as ultima_compra " +
+                    "FROM clientes c " +
+                    "JOIN ordenes_compra o ON c.id_cliente = o.id_cliente " +
+                    "GROUP BY c.id_cliente, c.nombre " +
+                    "ORDER BY num_compras DESC, total_gastado DESC " +
+                    "LIMIT ?";
+
+            PreparedStatement stmt = conexion.prepareStatement(sql);
+            stmt.setInt(1, limite);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row = new Object[]{
+                        rs.getInt("id_cliente"),
+                        rs.getString("nombre_cliente"),
+                        rs.getInt("num_compras"),
+                        String.format("$%.2f", rs.getDouble("total_gastado")),
+                        rs.getTimestamp("ultima_compra")
+                };
+                tableModel.addRow(row);
+            }
+
+            rs.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al generar reporte de clientes con más compras: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void generarReporteStockBajo(int umbralStock) {
+        tableModel.setRowCount(0);
+
+        // Configurar columnas específicas para este reporte
+        configurarColumnas(new String[]{"ID Producto", "Nombre Producto", "Categoría", "Stock Actual", "Precio", "Proveedor ID"});
+
+        try {
+            String sql = "SELECT p.id_producto, p.nombre_producto, p.categoria, " +
+                    "p.cantidad_stock, p.precio_producto, p.id_proveedor_asociado " +
+                    "FROM inventario_productos p " +
+                    "WHERE p.cantidad_stock <= ? " +
+                    "ORDER BY p.cantidad_stock ASC, p.nombre_producto ASC";
+
+            PreparedStatement stmt = conexion.prepareStatement(sql);
+            stmt.setInt(1, umbralStock);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row = new Object[]{
+                        rs.getInt("id_producto"),
+                        rs.getString("nombre_producto"),
+                        rs.getString("categoria"),
+                        rs.getInt("cantidad_stock"),
+                        String.format("$%.2f", rs.getDouble("precio_producto")),
+                        rs.getInt("id_proveedor_asociado")
+                };
+                tableModel.addRow(row);
+            }
+
+            rs.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al generar reporte de stock bajo: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void configurarColumnas(String[] columnas) {
+        tableModel.setColumnCount(0);
+        for (String columna : columnas) {
+            tableModel.addColumn(columna);
+        }
+    }
+
+    public void generarFacturaPDF(String tipoReporte, String nombreEmpleado) {
+        try {
+            // Crear el diálogo para seleccionar dónde guardar el archivo
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Guardar factura PDF");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setSelectedFile(new File("Factura_" + tipoReporte.replace(" ", "_") + ".pdf"));
+
+            if (fileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+
+            File archivoSeleccionado = fileChooser.getSelectedFile();
+            String rutaArchivo = archivoSeleccionado.getAbsolutePath();
+            if (!rutaArchivo.toLowerCase().endsWith(".pdf")) {
+                rutaArchivo += ".pdf";
+            }
+
+            // Configurar el documento
+            Document documento = new Document(PageSize.A4);
+            PdfWriter.getInstance(documento, new FileOutputStream(rutaArchivo));
+            documento.open();
+
+            // Definir fuentes
+            Font fontTitulo = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLACK);
+            Font fontSubtitulo = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+            Font fontNormal = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL, BaseColor.BLACK);
+            Font fontNegrita = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
+            Font fontPequeña = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+
+
+            // Título y datos de la empresa
+            Paragraph titulo = new Paragraph();
+            addEmptyLine(titulo, 5); // Espacio para el logo
+            titulo.add(new Paragraph("FERRETERÍA Future soft", fontTitulo));
+            titulo.add(new Paragraph("NIT: 900.123.456-7", fontNormal));
+            titulo.add(new Paragraph("Sede Sagrado", fontNormal));
+            titulo.add(new Paragraph("Teléfono: (57) 123-4567", fontNormal));
+            titulo.add(new Paragraph("Email: contacto@ferreteriafuturesotf.com", fontNormal));
+            titulo.setAlignment(Element.ALIGN_RIGHT);
+            documento.add(titulo);
+
+            // Datos de la factura
+            Paragraph datosFactura = new Paragraph();
+            addEmptyLine(datosFactura, 2);
+            datosFactura.add(new Paragraph("FACTURA DE " + tipoReporte.toUpperCase(), fontSubtitulo));
+
+            // Obtener un ID único para la factura (puede ser con timestamp o un contador)
+            SimpleDateFormat sdfId = new SimpleDateFormat("yyyyMMddHHmmss");
+            String idFactura = sdfId.format(new Date());
+            datosFactura.add(new Paragraph("No. " + idFactura, fontSubtitulo));
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            datosFactura.add(new Paragraph("Fecha: " + sdf.format(new Date()), fontNormal));
+            datosFactura.setAlignment(Element.ALIGN_CENTER);
+            documento.add(datosFactura);
+
+            // Datos del cliente/usuario que genera el reporte
+            Paragraph datosUsuario = new Paragraph();
+            addEmptyLine(datosUsuario, 1);
+            datosUsuario.add(new Paragraph("DATOS DEL SOLICITANTE", fontNegrita));
+            if (nombreEmpleado != null && !nombreEmpleado.isEmpty() && !nombreEmpleado.startsWith("Seleccione")) {
+                datosUsuario.add(new Paragraph("Generado por: " + nombreEmpleado, fontNormal));
+            } else {
+                datosUsuario.add(new Paragraph("Generado por: Usuario del sistema", fontNormal));
+            }
+            datosUsuario.add(new Paragraph("Tipo de reporte: " + tipoReporte, fontNormal));
+            documento.add(datosUsuario);
+
+            // Tabla de contenido del reporte
+            addEmptyLine(new Paragraph(), 1);
+            documento.add(new Paragraph("DETALLE DEL REPORTE", fontNegrita));
+
+            PdfPTable tabla = new PdfPTable(reportesTable.getColumnCount());
+            tabla.setWidthPercentage(100);
+            tabla.setSpacingBefore(10f);
+            tabla.setSpacingAfter(10f);
+
+            // Ajustar anchos de columnas si es necesario
+            float[] columnWidths = new float[reportesTable.getColumnCount()];
+            for (int i = 0; i < reportesTable.getColumnCount(); i++) {
+                columnWidths[i] = 1f; // Todas las columnas con el mismo ancho por defecto
+            }
+            tabla.setWidths(columnWidths);
+
+            // Encabezados de la tabla
+            for (int i = 0; i < reportesTable.getColumnCount(); i++) {
+                PdfPCell cell = new PdfPCell(new Phrase(reportesTable.getColumnName(i), fontNegrita));
+                cell.setBackgroundColor(new BaseColor(220, 220, 220));
+                cell.setPadding(5);
+                tabla.addCell(cell);
+            }
+
+            // Agregar datos a la tabla
+            for (int row = 0; row < reportesTable.getRowCount(); row++) {
+                for (int col = 0; col < reportesTable.getColumnCount(); col++) {
+                    Object value = reportesTable.getValueAt(row, col);
+                    String texto = (value != null) ? value.toString() : "";
+                    tabla.addCell(new Phrase(texto, fontNormal));
                 }
             }
 
-            if (!encontrado) {
-                Vector<Object> fila = new Vector<>();
-                fila.add(producto.getId_producto());
-                fila.add(producto.getCategoria());
-                fila.add(producto.getNombre_producto());
-                fila.add(producto.getId_proveedor_asociado());
-                //fila.add(producto.getPrecio_venta());
-                fila.add(1); // Cantidad
-                //fila.add(producto.getPrecio_venta()); // Subtotal
-                model.addRow(fila);
-            }
-        }
+            documento.add(tabla);
 
-        // Guarda la venta principal en la tabla registro_ventas, incluyendo el estado
-        public int guardarVenta(int idCliente, int idEmpleado, int total, String estado) {
-            int idVenta = -1;
-            String sql = "INSERT INTO registro_ventas (id_cliente, id_empleado, total, estado, fecha) VALUES (?, ?, ?, ?, NOW())";
+            // Si es posible, agregar resumen o estadísticas
+            if (reportesTable.getRowCount() > 0) {
+                Paragraph resumen = new Paragraph();
+                addEmptyLine(resumen, 1);
 
-            ConexionBD conBD = new ConexionBD();
-            try (Connection conn = conBD.getconnection();
-                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PdfPTable tablaTotales = new PdfPTable(2);
+                tablaTotales.setWidthPercentage(40);
+                tablaTotales.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                tablaTotales.setSpacingBefore(10f);
 
-                ps.setInt(1, idCliente);
-                ps.setInt(2, idEmpleado);
-                ps.setInt(3, total);
-                ps.setString(4, estado);  // Aquí se agrega el estado
+                tablaTotales.addCell(new Phrase("Total de registros:", fontNegrita));
+                tablaTotales.addCell(new Phrase(String.valueOf(reportesTable.getRowCount()), fontNormal));
 
-                ps.executeUpdate();
+                // Agregar más estadísticas según el tipo de reporte
+                if (tipoReporte.contains("Ventas")) {
+                    double totalVentas = 0;
+                    int totalOrdenes = 0;
+                    for (int row = 0; row < reportesTable.getRowCount(); row++) {
+                        String ventasStr = ((String) reportesTable.getValueAt(row, 1)).replace("$", "").replace(",", "");
+                        totalVentas += Double.parseDouble(ventasStr);
+                        totalOrdenes += (Integer) reportesTable.getValueAt(row, 2);
+                    }
 
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    idVenta = rs.getInt(1);
+                    tablaTotales.addCell(new Phrase("Total ventas:", fontNegrita));
+                    tablaTotales.addCell(new Phrase(String.format("$%.2f", totalVentas), fontNormal));
+
+                    tablaTotales.addCell(new Phrase("Total órdenes:", fontNegrita));
+                    tablaTotales.addCell(new Phrase(String.valueOf(totalOrdenes), fontNormal));
                 }
 
-            } catch (SQLException e) {
-                e.printStackTrace();
+                documento.add(tablaTotales);
             }
 
-            return idVenta;
-        }
+            // Información adicional
+            Paragraph infoAdicional = new Paragraph();
+            addEmptyLine(infoAdicional, 2);
+            infoAdicional.add(new Paragraph("INFORMACIÓN ADICIONAL", fontNegrita));
+            infoAdicional.add(new Paragraph("Reporte generado el: " + sdf.format(new Date()), fontNormal));
+            documento.add(infoAdicional);
 
+            // Notas y condiciones
+            Paragraph notas = new Paragraph();
+            addEmptyLine(notas, 2);
+            notas.add(new Paragraph("NOTAS Y CONDICIONES", fontNegrita));
+            notas.add(new Paragraph("- Este documento es para uso interno de la empresa.", fontPequeña));
+            notas.add(new Paragraph("- La información contenida es confidencial.", fontPequeña));
+            notas.add(new Paragraph("- Prohibida su reproducción sin autorización.", fontPequeña));
+            documento.add(notas);
 
-        // Guarda el detalle de cada producto vendido
-        public void guardarDetalleVenta(int idVenta, int idProducto, int cantidad, int precioUnitario, int subtotal) {
-            String sql = "INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
+            // Pie de página
+            Paragraph footer = new Paragraph();
+            addEmptyLine(footer, 2);
+            footer.add(new Paragraph("Sistema de Reportes - Ferretería Future Soft", fontNormal));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            documento.add(footer);
 
-            ConexionBD conBD = new ConexionBD();
-            try (Connection conn = conBD.getconnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
+            // Cerrar el documento
+            documento.close();
 
-                ps.setInt(1, idVenta);
-                ps.setInt(2, idProducto);
-                ps.setInt(3, cantidad);
-                ps.setInt(4, precioUnitario);
-                ps.setInt(5, subtotal);
-                ps.executeUpdate();
+            JOptionPane.showMessageDialog(null,
+                    "Factura de reporte generada correctamente.\nGuardada en: " + rutaArchivo,
+                    "Exportación Exitosa", JOptionPane.INFORMATION_MESSAGE);
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-
-
-        // Resta la cantidad vendida al inventario
-        public void actualizarStock(int idProducto, int cantidadVendida) {
-            String sql = "UPDATE inventario_productos SET cantidad_stock = cantidad_stock - ? WHERE id_producto = ?";
-
-            ConexionBD conBD = new ConexionBD();
-            try (Connection conn = conBD.getconnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-
-                ps.setInt(1, cantidadVendida);
-                ps.setInt(2, idProducto);
-                ps.executeUpdate();
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public ResultSet obtenerVentasFiltradas(String filtro) {
-            String condicionFecha = "";
-
-            switch (filtro) {
-                case "Diario":
-                    condicionFecha = "DATE(fecha) = CURDATE()";
-                    break;
-                case "Semanal":
-                    condicionFecha = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
-                    break;
-                case "Mensual":
-                    condicionFecha = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
-                    break;
-            }
-
-            String sql = "SELECT id_venta, total, fecha, estado FROM registro_ventas WHERE " + condicionFecha;
-            ConexionBD conBD = new ConexionBD();
-
+            // Abrir el archivo automáticamente
             try {
-                Connection conn = conBD.getconnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                return ps.executeQuery();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
+                File pdfFile = new File(rutaArchivo);
+                if (pdfFile.exists()) {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(pdfFile);
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                                "No se puede abrir automáticamente. El archivo está en: " + rutaArchivo);
+                    }
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error al abrir el archivo: " + ex.getMessage());
             }
+        } catch (DocumentException | IOException e) {
+            JOptionPane.showMessageDialog(null,
+                    "Error al generar la factura: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
+    }
 
+    public void exportarReporteActualAPDF(String tipoReporte, String nombreEmpleado) {
+        generarFacturaPDF(tipoReporte, nombreEmpleado);
+    }
 
-
-        public ResultSet obtenerProductosMasVendidos(String filtro) {
-            String condicionFecha = "";
-
-            switch (filtro) {
-                case "Diario":
-                    condicionFecha = "DATE(v.fecha) = CURDATE()";
-                    break;
-                case "Semanal":
-                    condicionFecha = "YEARWEEK(v.fecha, 1) = YEARWEEK(CURDATE(), 1)";
-                    break;
-                case "Mensual":
-                    condicionFecha = "MONTH(v.fecha) = MONTH(CURDATE()) AND YEAR(v.fecha) = YEAR(CURDATE())";
-                    break;
-            }
-
-            String sql = "SELECT p.nombre_producto, SUM(dv.cantidad) AS total_vendidos " +
-                    "FROM detalle_venta dv " +
-                    "INNER JOIN inventario_productos p ON dv.id_producto = p.id_producto " +
-                    "INNER JOIN registro_ventas v ON dv.id_venta = v.id_venta " +
-                    "WHERE " + condicionFecha + " " +
-                    "GROUP BY p.nombre_producto " +
-                    "ORDER BY total_vendidos DESC " +
-                    "LIMIT 5";
-
-            ConexionBD conBD = new ConexionBD();
-
-            try {
-                Connection conn = conBD.getconnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                return ps.executeQuery();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-            }
+    private void addEmptyLine(Paragraph paragraph, int number) {
+        for (int i = 0; i < number; i++) {
+            paragraph.add(new Paragraph(" "));
         }
-
-
-
-        public ResultSet obtenerClientesTop(String filtro) {
-            String condicionFecha = "";
-
-            switch (filtro) {
-                case "Diario":
-                    condicionFecha = "DATE(v.fecha) = CURDATE()";
-                    break;
-                case "Semanal":
-                    condicionFecha = "YEARWEEK(v.fecha, 1) = YEARWEEK(CURDATE(), 1)";
-                    break;
-                case "Mensual":
-                    condicionFecha = "MONTH(v.fecha) = MONTH(CURDATE()) AND YEAR(v.fecha) = YEAR(CURDATE())";
-                    break;
-            }
-
-            String sql = "SELECT c.nombre AS nombre_cliente, SUM(v.total) AS total_compras " +
-                    "FROM registro_ventas v " +
-                    "INNER JOIN clientes c ON v.id_cliente = c.id_cliente " +
-                    "WHERE " + condicionFecha + " " +
-                    "GROUP BY c.nombre " +
-                    "ORDER BY total_compras DESC " +
-                    "LIMIT 5";
-
-            ConexionBD conBD = new ConexionBD();
-
-            try {
-                Connection conn = conBD.getconnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                return ps.executeQuery();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-
-
-        public java.sql.Date obtenerFechaFiltro(String filtro) {
-            java.util.Calendar cal = java.util.Calendar.getInstance();
-
-            switch (filtro) {
-                case "Diario" -> cal.add(java.util.Calendar.DAY_OF_MONTH, -1);
-                case "Semanal" -> cal.add(java.util.Calendar.DAY_OF_MONTH, -7);
-                case "Mensual" -> cal.add(java.util.Calendar.MONTH, -1);
-            }
-
-            return new java.sql.Date(cal.getTimeInMillis());
-        }
-
-        public boolean actualizarEstadoVenta(int idVenta, String nuevoEstado) {
-            String sql = "UPDATE registro_ventas SET estado = ? WHERE id_venta = ?";
-            ConexionBD conBD = new ConexionBD();
-
-            try (Connection conn = conBD.getconnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-
-                ps.setString(1, nuevoEstado);
-                ps.setInt(2, idVenta);
-
-                return ps.executeUpdate() > 0;
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-
-
-
+    }
 }

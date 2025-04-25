@@ -25,6 +25,7 @@ public class MenuPrincipal {
     private JButton chatAdministradorButton;
     private JButton reportesButton;
     private JButton ventasButton;
+    private JPanel mainPanel;
 
     public MenuPrincipal() {
         main = new img();
@@ -119,5 +120,18 @@ public class MenuPrincipal {
 
     public static void main(String[] args) {
         new MenuPrincipal();
+    }
+
+    public Container getMainPanel() {
+        if (mainPanel == null) {
+            mainPanel = new JPanel();
+            mainPanel.setLayout(new BorderLayout());
+            mainPanel.add(main, BorderLayout.CENTER);
+        }
+        return mainPanel;
+    }
+
+    public void setMainPanel(Container mainPanel) {
+        this.mainPanel = (JPanel) mainPanel;
     }
 }
