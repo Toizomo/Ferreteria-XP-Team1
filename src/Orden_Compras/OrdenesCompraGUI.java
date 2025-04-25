@@ -1,5 +1,18 @@
 package Orden_Compras;
 
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import javax.mail.*;
+
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -32,6 +45,12 @@ public class OrdenesCompraGUI {
     private JButton buscarButton;
     private JButton limpiarFiltrosButton;
     private static final double IVA_RATE = 0.19;
+
+    private void addEmptyLine(Paragraph paragraph, int number) {
+        for (int i = 0; i < number; i++) {
+            paragraph.add(new Paragraph(" "));
+        }
+    }
 
     private class OrdenDetalle {
         private int idOrden;
@@ -172,7 +191,6 @@ public class OrdenesCompraGUI {
         return mainPanel;
     }
 
-
     public OrdenesCompraGUI() {
         // Configurar la tabla
         configurarTabla();
@@ -199,6 +217,12 @@ public class OrdenesCompraGUI {
 
         // Listener para el campo de ID de orden
         configurarListenerIdOrden();
+
+        //limpiar campos
+        limpiarCampos();
+
+        // Aplicar los estilos
+        aplicarEstilos();
     }
 
     private void configurarListenerTabla() {
@@ -349,6 +373,7 @@ public class OrdenesCompraGUI {
                 JOptionPane.showMessageDialog(null, "Por favor, seleccione una orden para generar factura");
                 return;
             }
+            generarFacturaPDF();
         });
 
         buscarButton.addActionListener(e -> aplicarFiltro());
@@ -540,6 +565,236 @@ public class OrdenesCompraGUI {
 
         // Mostrar el diálogo
         dialog.setVisible(true);
+    }
+
+    private void generarFacturaPDF() {
+        try {
+            int idOrden = Integer.parseInt(idOrdenCompra.getText().trim());
+            OrdenDetalle ordenDetalle = obtenerDetalleOrden(idOrden);
+
+            if (ordenDetalle == null) {
+                JOptionPane.showMessageDialog(null, "No se encontraron los detalles de la orden");
+                return;
+            }
+
+            // Verificar si el estado permite generar factura
+            if ("pendiente".equals(ordenDetalle.getEstado())) {
+                int respuesta = JOptionPane.showConfirmDialog(null,
+                        "La orden está en estado Pendiente. ¿Desea generar la factura de todos modos?",
+                        "Confirmación", JOptionPane.YES_NO_OPTION);
+                if (respuesta != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+
+            // Configurar el documento
+            Document documento = new Document(PageSize.A4);
+            String rutaDescargas = System.getProperty("user.home") + File.separator + "Downloads";
+            String nombreArchivo = "Factura_Compra" + idOrden + ".pdf";
+            String rutaArchivo = rutaDescargas + File.separator + nombreArchivo;
+
+            PdfWriter.getInstance(documento, new FileOutputStream(rutaArchivo));
+            documento.open();
+
+            // Definir fuentes
+            Font fontTitulo = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLACK);
+            Font fontSubtitulo = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+            Font fontNormal = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL, BaseColor.BLACK);
+            Font fontNegrita = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
+            Font fontPequeña = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+
+            // Título y datos de la empresa
+            Paragraph titulo = new Paragraph();
+            addEmptyLine(titulo, 5); // Espacio para el logo
+            titulo.add(new Paragraph("FERRETERÍA El Santuario Del Fierro", fontTitulo));
+            titulo.add(new Paragraph("NIT: 900.123.456-7", fontNormal));
+            titulo.add(new Paragraph("Sede Sagrado", fontNormal));
+            titulo.add(new Paragraph("Teléfono: (57) 123-4567", fontNormal));
+            titulo.add(new Paragraph("Email: contacto@ferreteriaDelFierro.com", fontNormal));
+            titulo.setAlignment(Element.ALIGN_RIGHT);
+            documento.add(titulo);
+
+            // Datos de la factura
+            Paragraph datosFactura = new Paragraph();
+            addEmptyLine(datosFactura, 2);
+            datosFactura.add(new Paragraph("FACTURA DE VENTA", fontSubtitulo));
+            datosFactura.add(new Paragraph("No. " + idOrden, fontSubtitulo));
+            datosFactura.add(new Paragraph("Fecha: " + ordenDetalle.getFecha(), fontNormal));
+            datosFactura.setAlignment(Element.ALIGN_CENTER);
+            documento.add(datosFactura);
+
+            // Datos del cliente
+            Paragraph datosCliente = new Paragraph();
+            addEmptyLine(datosCliente, 1);
+            datosCliente.add(new Paragraph("DATOS DEL CLIENTE", fontNegrita));
+            datosCliente.add(new Paragraph("Cliente: " + ordenDetalle.getCliente(), fontNormal));
+            datosCliente.add(new Paragraph("Dirección: " + ordenDetalle.getDireccion(), fontNormal));
+            datosCliente.add(new Paragraph("Teléfono: " + ordenDetalle.getTelefono(), fontNormal));
+            documento.add(datosCliente);
+
+            // Tabla de productos
+            addEmptyLine(new Paragraph(), 1);
+            documento.add(new Paragraph("DETALLE DE PRODUCTOS", fontNegrita));
+
+            PdfPTable tabla = new PdfPTable(5);
+            tabla.setWidthPercentage(100);
+            tabla.setSpacingBefore(10f);
+            tabla.setSpacingAfter(10f);
+
+            float[] columnWidths = {1.5f, 1f, 1f, 1f, 1f};
+            tabla.setWidths(columnWidths);
+
+            // Encabezados de la tabla
+            PdfPCell cell = new PdfPCell(new Phrase("Descripción", fontNegrita));
+            cell.setBackgroundColor(new BaseColor(220, 220, 220));
+            cell.setPadding(5);
+            tabla.addCell(cell);
+
+            cell = new PdfPCell(new Phrase("Cantidad", fontNegrita));
+            cell.setBackgroundColor(new BaseColor(220, 220, 220));
+            cell.setPadding(5);
+            tabla.addCell(cell);
+
+            cell = new PdfPCell(new Phrase("Precio Unit.", fontNegrita));
+            cell.setBackgroundColor(new BaseColor(220, 220, 220));
+            cell.setPadding(5);
+            tabla.addCell(cell);
+
+            cell = new PdfPCell(new Phrase("IVA (19%)", fontNegrita));
+            cell.setBackgroundColor(new BaseColor(220, 220, 220));
+            cell.setPadding(5);
+            tabla.addCell(cell);
+
+            cell = new PdfPCell(new Phrase("Total", fontNegrita));
+            cell.setBackgroundColor(new BaseColor(220, 220, 220));
+            cell.setPadding(5);
+            tabla.addCell(cell);
+
+            // Agregar todos los productos a la tabla
+            double subtotal = 0;
+            double ivaTotal = 0;
+            double granTotal = 0;
+
+            for (ProductoOrden producto : ordenDetalle.getProductos()) {
+                // Datos del producto
+                tabla.addCell(new Phrase(producto.getNombre(), fontNormal));
+                tabla.addCell(new Phrase(String.valueOf(producto.getCantidad()), fontNormal));
+                tabla.addCell(new Phrase(String.format("%.2f", producto.getPrecioUnitario()), fontNormal));
+
+                // Cálculo del IVA por producto
+                double ivaProducto = producto.getIva();
+                tabla.addCell(new Phrase(String.format("%.2f", ivaProducto), fontNormal));
+
+                // Total por producto
+                double totalProducto = producto.getTotal();
+                tabla.addCell(new Phrase(String.format("%.2f", totalProducto), fontNormal));
+
+                // Actualizar totales
+                subtotal += producto.getPrecioUnitario() * producto.getCantidad();
+                ivaTotal += ivaProducto;
+                granTotal += totalProducto;
+            }
+
+            documento.add(tabla);
+
+            // Resumen de totales
+            Paragraph resumen = new Paragraph();
+            addEmptyLine(resumen, 1);
+
+            PdfPTable tablaTotales = new PdfPTable(2);
+            tablaTotales.setWidthPercentage(40);
+            tablaTotales.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            tablaTotales.setSpacingBefore(10f);
+
+            tablaTotales.addCell(new Phrase("Subtotal:", fontNegrita));
+            tablaTotales.addCell(new Phrase(String.format("$%.2f", subtotal), fontNormal));
+
+            tablaTotales.addCell(new Phrase("IVA (19%):", fontNegrita));
+            tablaTotales.addCell(new Phrase(String.format("$%.2f", ivaTotal), fontNormal));
+
+            tablaTotales.addCell(new Phrase("TOTAL:", fontNegrita));
+            cell = new PdfPCell(new Phrase(String.format("$%.2f", granTotal), fontNegrita));
+            cell.setBackgroundColor(new BaseColor(220, 220, 220));
+            tablaTotales.addCell(cell);
+
+            documento.add(tablaTotales);
+
+            // Información adicional
+            Paragraph infoAdicional = new Paragraph();
+            addEmptyLine(infoAdicional, 2);
+            infoAdicional.add(new Paragraph("INFORMACIÓN ADICIONAL", fontNegrita));
+            infoAdicional.add(new Paragraph("Estado de la orden: " + ordenDetalle.getEstado(), fontNormal));
+            infoAdicional.add(new Paragraph("Atendido por: " + ordenDetalle.getEmpleado(), fontNormal));
+            documento.add(infoAdicional);
+
+            // Notas y condiciones
+            Paragraph notas = new Paragraph();
+            addEmptyLine(notas, 2);
+            notas.add(new Paragraph("NOTAS Y CONDICIONES", fontNegrita));
+            notas.add(new Paragraph("- Esta factura es un título valor según la ley.", fontPequeña));
+            notas.add(new Paragraph("- La garantía de los productos es de 30 días.", fontPequeña));
+            notas.add(new Paragraph("- No se aceptan devoluciones después de 15 días.", fontPequeña));
+            documento.add(notas);
+
+            // Pie de página
+            Paragraph footer = new Paragraph();
+            addEmptyLine(footer, 2);
+            footer.add(new Paragraph("¡Gracias por su compra!", fontNormal));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            documento.add(footer);
+
+            // Cerrar el documento
+            documento.close();
+
+            JOptionPane.showMessageDialog(null, "Factura generada correctamente.\nGuardada en: " + rutaArchivo);
+
+            // Abrir el archivo automáticamente
+            try {
+                File pdfFile = new File(rutaArchivo);
+                if (pdfFile.exists()) {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(pdfFile);
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                                "No se puede abrir automáticamente. El archivo está en: " + rutaArchivo);
+                    }
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error al abrir el archivo: " + ex.getMessage());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al generar la factura: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void aplicarEstilos() {
+        java.awt.Font fuenteCampos = new java.awt.Font("Serif", java.awt.Font.PLAIN, 15);
+        java.awt.Font fuenteBotones = new java.awt.Font("Serif", java.awt.Font.BOLD, 15);
+        Color colorFondo = new Color(216, 196, 164); // beige claro
+        Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
+        Color colorBotonFondo = colorFondo;
+        Color colorBotonTexto = Color.BLACK;
+        Color colorBordeBoton = Color.WHITE;
+
+        mainPanel.setBackground(colorFondo);
+
+        JButton[] botones = { buscarButton, limpiarFiltrosButton, actualizarEstadoButton, generarFacturaButton };
+        for (JButton boton : botones) {
+            boton.setFont(fuenteBotones);
+            boton.setBackground(colorBotonFondo);
+            boton.setForeground(colorBotonTexto);
+            boton.setBorder(BorderFactory.createLineBorder(colorBordeBoton));
+            boton.setFocusPainted(false);
+        }
+
+        table1.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 14));
+        table1.setForeground(colorTexto);
+        table1.setBackground(Color.WHITE);
+        table1.setRowHeight(25);
+        table1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 15));
+        table1.getTableHeader().setBackground(colorFondo);
+        table1.getTableHeader().setForeground(colorTexto);
     }
 
     public static void main(String[] args) {
