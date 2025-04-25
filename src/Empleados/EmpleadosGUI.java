@@ -136,23 +136,18 @@ public class EmpleadosGUI {
         Color colorFondo = new Color(216, 196, 164); // beige claro
         Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
         Color colorBotonFondo = colorFondo;
-        Color colorBotonTexto = Color.WHITE;
+        Color colorBotonTexto = Color.BLACK;
         Color colorBordeBoton = Color.WHITE;
 
         main.setBackground(colorFondo);
 
-        JTextField[] campos = { textField1, textField2, textField3 };
+        JTextField[] campos = { textField1, textField2, textField3};
         for (JTextField campo : campos) {
             campo.setFont(fuenteCampos);
             campo.setBackground(Color.WHITE);
             campo.setForeground(colorTexto);
             campo.setBorder(BorderFactory.createLineBorder(colorTexto));
         }
-
-        comboBox1.setFont(fuenteCampos);
-        comboBox1.setBackground(Color.WHITE);
-        comboBox1.setForeground(colorTexto);
-        comboBox1.setBorder(BorderFactory.createLineBorder(colorTexto));
 
         JButton[] botones = { agregarButton, actualizarButton, eliminarButton, volverButton };
         for (JButton boton : botones) {

@@ -167,7 +167,7 @@ public class ClientesGUI {
         Color colorFondo = new Color(216, 196, 164); // beige claro
         Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
         Color colorBotonFondo = colorFondo;
-        Color colorBotonTexto = Color.WHITE;
+        Color colorBotonTexto = Color.BLACK;
         Color colorBordeBoton = Color.WHITE;
 
         main.setBackground(colorFondo);

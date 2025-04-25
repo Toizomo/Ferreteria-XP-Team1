@@ -79,7 +79,7 @@ public class ReportesGUI extends JPanel {
         Color colorFondo = new Color(216, 196, 164); // beige claro
         Color colorTexto = new Color(59, 42, 27);    // marrón oscuro
         Color colorBotonFondo = colorFondo;
-        Color colorBotonTexto = Color.WHITE;
+        Color colorBotonTexto = Color.BLACK;
         Color colorBordeBoton = Color.WHITE;
         Color fondoTabla = new Color(245, 245, 245);
         Color fondoAlternativo = new Color(230, 230, 230);
