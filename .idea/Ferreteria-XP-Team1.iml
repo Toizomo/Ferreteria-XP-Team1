@@ -12,5 +12,8 @@
     <orderEntry type="library" name="flatlaf-intellij-themes-3.5.4" level="project" />
     <orderEntry type="library" name="flatlaf-3.5.4" level="project" />
     <orderEntry type="library" name="jakarta.mail-2.0.1" level="project" />
+    <orderEntry type="library" name="javax.mail.api" level="project" />
+    <orderEntry type="library" name="javax.mail-1.6.2" level="project" />
+    <orderEntry type="library" name="activation-1.1.1" level="project" />
   </component>
 </module>
