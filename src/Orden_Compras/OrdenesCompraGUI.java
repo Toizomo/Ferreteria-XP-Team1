@@ -1,21 +1,17 @@
 package Orden_Compras;
 
+import MenuPrincipal.MenuPrincipal;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import javax.mail.*;
-
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -223,6 +219,7 @@ public class OrdenesCompraGUI {
 
         // Aplicar los estilos
         aplicarEstilos();
+
     }
 
     private void configurarListenerTabla() {
