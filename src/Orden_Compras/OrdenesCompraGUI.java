@@ -1,13 +1,20 @@
 package Orden_Compras;
 
+import Conexion.ConexionBD;
 import MenuPrincipal.MenuPrincipal;
 import Orden_Compras.OrdenesCompraDAO;
 import Orden_Compras.ordenesCompra;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class OrdenesCompraGUI {
     private JTable table1;
@@ -24,6 +31,7 @@ public class OrdenesCompraGUI {
 
     public OrdenesCompraGUI() {
 
+        obtener_datos();
         // Aplicar estilos
         aplicarEstilos();
 
@@ -39,6 +47,7 @@ public class OrdenesCompraGUI {
 
                     ordenesCompra orden = new ordenesCompra(0, cliente, empleado, producto, totalCompra, fecha);
                     OrdenesCompraDAO.agregar(orden);
+                    obtener_datos();
 
                     JOptionPane.showMessageDialog(null, "Compra agregada correctamente.");
                 } catch (Exception ex) {
@@ -60,6 +69,7 @@ public class OrdenesCompraGUI {
 
                     ordenesCompra orden = new ordenesCompra(0, cliente, empleado, producto, totalCompra, fecha);
                     OrdenesCompraDAO.actualizar(orden);
+                    obtener_datos();
 
                     JOptionPane.showMessageDialog(null, "Compra actualizada correctamente.");
                 } catch (Exception ex) {
@@ -68,12 +78,30 @@ public class OrdenesCompraGUI {
             }
         });
 
+
+
         volverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
                 jFrame.dispose();
                 MenuPrincipal.main(null);
+            }
+        });
+
+        table1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int selectFila = table1.getSelectedRow();
+                if (selectFila >= 0) {
+                    idOrdenCompra.setText(table1.getValueAt(selectFila, 0).toString());
+                    idCliente.setText(table1.getValueAt(selectFila, 1).toString());
+                    idEmpleado.setText(table1.getValueAt(selectFila, 2).toString());
+                    idProducto.setText(table1.getValueAt(selectFila, 3).toString());
+                    total.setText(table1.getValueAt(selectFila, 4).toString());
+                    fechaCompra.setText(table1.getValueAt(selectFila, 5).toString());
+                }
             }
         });
     }
@@ -88,6 +116,43 @@ public class OrdenesCompraGUI {
         frame.setResizable(false);
     }
 
+    public void obtener_datos()
+    {
+        // Aquí puedes implementar la lógica para obtener datos de la base de datos
+        // y llenar la tabla con esos datos.
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Orden");
+        model.addColumn("ID Cliente");
+        model.addColumn("ID Empleado");
+        model.addColumn("ID Producto");
+        model.addColumn("Total");
+        model.addColumn("Fecha Compra");
+
+        table1.setModel(model);
+        Connection con = ConexionBD.getconnection();
+
+        try
+        {
+            Statement stmt = con.createStatement();
+            String query = "SELECT * FROM ordenes_compra";
+            ResultSet rs = stmt.executeQuery(query);
+
+            while (rs.next()){
+                Object[] fila = new Object[6];
+                fila[0] = rs.getInt("id_orden_compra");
+                fila[1] = rs.getInt("id_cliente");
+                fila[2] = rs.getInt("id_empleado");
+                fila[3] = rs.getInt("id_producto");
+                fila[4] = rs.getDouble("total");
+                fila[5] = rs.getString("fecha_compra");
+                model.addRow(fila);
+            }
+
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al obtener datos: " + e.getMessage());
+        }
+    }
     private void aplicarEstilos() {
         Font fuenteCampos = new Font("Serif", Font.PLAIN, 15);
         Font fuenteBotones = new Font("Serif", Font.BOLD, 15);
