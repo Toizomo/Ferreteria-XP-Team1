@@ -4,6 +4,7 @@
 package Reportes;
 
 import Conexion.ConexionBD;
+import MenuPrincipal.MenuPrincipal;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -358,13 +359,14 @@ public class ReportesGUI extends JFrame {
                 // Aquí puedes abrir la ventana anterior si es necesario
             }
         });
+        regresarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose(); // Cierra esta ventana
+                new MenuPrincipal(); // Abre el menú principal
+            }
+        });
 
-//        salirButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                System.exit(0);
-//            }
-//        });
     }
 
     private void guardarRegistroReporte(String tipoReporte) {
@@ -399,8 +401,7 @@ public class ReportesGUI extends JFrame {
 
             if (result > 0) {
                 System.out.println("Registro de reporte guardado correctamente");
-                // Opcionalmente refrescar la lista de reportes
-                // cargarReportes();
+
             }
         } catch (SQLException e) {
             System.out.println("Error al guardar registro de reporte: " + e.getMessage());
