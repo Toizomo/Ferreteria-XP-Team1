@@ -179,7 +179,6 @@
               <background color="-12899813"/>
               <font name="JetBrains Mono"/>
               <horizontalTextPosition value="0"/>
-              <icon value=""/>
               <text value="Generar Reporte"/>
             </properties>
           </component>
